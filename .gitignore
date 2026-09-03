@@ -1,0 +1,43 @@
+# Dependências
+node_modules/
+.pnp/
+.pnp.js
+
+# Build
+dist/
+build/
+*.apk
+*.aab
+.expo/
+.expo-shared/
+
+# Ambiente e segredos
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Banco local
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Editores e SO
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Dados de pesquisa — NÃO versionar (LGPD)
+docs/entrevistas/brutas/
+*.transcricao.md
+
+# Notas de trabalho internas
+docs/resumo-projeto-app-cuidadores.md
