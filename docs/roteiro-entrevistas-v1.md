@@ -15,8 +15,8 @@ Validar (ou refutar) as suposições que sustentam o documento de requisitos v1.
 
 A coleta responde a três perguntas:
 
-1. O problema que assumimos existir é real, e é doloroso o suficiente para alguém mudar de comportamento?
-2. Os diferenciais que definimos (especialização por tipo de cuidado e painel de acompanhamento) importam para quem vai usar?
+1. O problema pressuposto pelo projeto é real, e é doloroso o suficiente para alguém mudar de comportamento?
+2. Os diferenciais definidos (especialização por tipo de cuidado e painel de acompanhamento) importam para quem vai usar?
 3. Quais requisitos estão faltando, sobrando ou mal priorizados?
 
 ### 1.1 Hipóteses a testar
@@ -51,22 +51,22 @@ Cada hipótese está ligada aos requisitos que caem se ela for falsa. Isso é o 
 | B: Cuidador(a) de idosos | 2 | 4 |
 | C: Especialista/intermediário (agência, ACS, profissional de saúde) | 0 | 1-2 |
 
-**Recrutamento:** rede pessoal da equipe, grupos de bairro, unidades básicas de saúde, agências locais de cuidadores, grupos de WhatsApp/Facebook de cuidadores da região de Quixadá e Fortaleza.
+**Recrutamento:** rede pessoal, grupos de bairro, unidades básicas de saúde, agências locais de cuidadores, grupos de WhatsApp/Facebook de cuidadores da região de Quixadá e Fortaleza.
 
 **Critérios de inclusão:**
 
 - Perfil A: contratou ou tentou contratar cuidador para um idoso nos últimos 24 meses.
 - Perfil B: trabalha ou trabalhou como cuidador(a) de idosos de forma autônoma nos últimos 24 meses.
 
-**Registro:** um entrevistador conduz, outro anota. Gravação de áudio **apenas com consentimento explícito**. Transcrição/notas anonimizadas em até 24h.
+**Registro:** conduzido por uma pessoa só, o que exige um método diferente do de dupla. Gravação de áudio **apenas com consentimento explícito**, para não precisar dividir atenção entre conduzir e anotar. Durante a conversa, anotar apenas frases literais e reações não verbais; o resto sai da gravação. Expandir as notas e anonimizá-las em até 24h, enquanto a memória ainda ajuda.
 
 ---
 
 ## 3. Termo de consentimento (ler antes de começar)
 
-> Olá, meu nome é ___ e sou estudante de Engenharia de Software da UFC em Quixadá. Estamos desenvolvendo um projeto acadêmico de um aplicativo para conectar famílias e cuidadores de idosos, chamado Zelio.
+> Olá, meu nome é ___ e sou estudante de Engenharia de Software da UFC em Quixadá. Estou desenvolvendo sozinho um projeto acadêmico de um aplicativo para conectar famílias e cuidadores de idosos, chamado Zelio.
 >
-> Gostaria de conversar por uns 30 minutos sobre a sua experiência. **Não estamos vendendo nada** e não existe resposta certa ou errada. Quanto mais sincero você for, inclusive sobre o que não funcionaria, mais útil para nós.
+> Gostaria de conversar por uns 30 minutos sobre a sua experiência. **Não estou vendendo nada** e não existe resposta certa ou errada. Quanto mais sincero você for, inclusive sobre o que não funcionaria, mais útil para mim.
 >
 > Suas respostas serão usadas **somente para fins acadêmicos**, e seu nome, o nome do idoso e qualquer dado que identifique vocês não aparecerão no trabalho. Você pode se recusar a responder qualquer pergunta e pode interromper a entrevista a qualquer momento, sem precisar justificar.
 >
@@ -80,7 +80,7 @@ Cada hipótese está ligada aos requisitos que caem se ela for falsa. Isso é o 
 
 ## 4. Regras de condução
 
-O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que queremos ouvir. Estas regras existem para evitar isso:
+O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que você quer ouvir. Estas regras existem para evitar isso:
 
 1. **Pergunte sobre o passado, não sobre o futuro.** "Me conta como foi a última vez que você precisou contratar alguém" vale mais que "Você usaria um app assim?". Opinião sobre o futuro é grátis; comportamento passado é evidência.
 2. **Não apresente a solução no começo.** Só descreva o app no bloco final (Bloco 5). Antes disso, o entrevistado precisa contar o problema com as palavras dele.
@@ -89,6 +89,7 @@ O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que
 5. **Vá atrás do custo real.** "O que você fez a respeito?", "Quanto tempo isso tomou?", "Quanto você pagou?". Problema que ninguém gastou tempo nem dinheiro para resolver não é problema.
 6. **Silêncio é ferramenta.** Depois da resposta, espere três segundos. A parte útil costuma vir aí.
 7. **Anote frases literais.** Citações diretas valem mais que paráfrases no relatório e na defesa do documento.
+8. **Cheque a gravação antes de começar.** Sozinho, se a gravação falhar você perde a entrevista inteira, porque não há segunda pessoa anotando.
 
 ---
 
@@ -125,13 +126,13 @@ O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que
 
 ### Bloco 5: Reação à solução (5 min) *(só agora)*
 
-> "Deixa eu te contar o que estamos pensando: um aplicativo onde você encontra cuidadores verificados, filtrando por especialidade, e onde o cuidador registra no celular o que aconteceu no dia (medicação, alimentação, intercorrências) e você acompanha de onde estiver."
+> "Deixa eu te contar o que estou pensando: um aplicativo onde você encontra cuidadores verificados, filtrando por especialidade, e onde o cuidador registra no celular o que aconteceu no dia (medicação, alimentação, intercorrências) e você acompanha de onde estiver."
 
 18. O que passou pela sua cabeça agora?
 19. O que nisso não te convence, ou o que te preocuparia? *(pergunte explicitamente pelo negativo)*
 20. Se isso existisse na última vez, você teria usado? Por quê? *(H2)*
 21. Quem na sua família conseguiria usar um app desses sozinho? *(H7, RNF01)*
-22. Tem alguém que você acha que a gente deveria conversar sobre isso?
+22. Tem alguém que você acha que eu deveria conversar sobre isso?
 
 ---
 
@@ -170,12 +171,12 @@ O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que
 
 ### Bloco 5: Reação à solução (5 min)
 
-> "Estamos pensando em um app onde você monta um perfil com suas especialidades, passa por uma verificação, e as famílias te encontram e contratam por ele. Durante o plantão você registra no celular o que aconteceu e a família acompanha."
+> "Estou pensando em um app onde você monta um perfil com suas especialidades, passa por uma verificação, e as famílias te encontram e contratam por ele. Durante o plantão você registra no celular o que aconteceu e a família acompanha."
 
 20. O que você acha disso?
 21. O que te faria **não** usar? *(pergunte pelo negativo)*
 22. Se o app cobrasse uma porcentagem do valor do plantão, isso faria sentido para você? Quanto seria demais? *(H6)*
-23. Tem colega cuidador com quem a gente poderia conversar?
+23. Tem colega cuidador com quem eu poderia conversar?
 
 ---
 
@@ -185,7 +186,7 @@ Para agência de cuidadores, agente comunitário de saúde, enfermeiro(a) ou ass
 
 1. Como as famílias da região costumam encontrar cuidadores hoje?
 2. Que problemas você vê acontecerem com mais frequência nessas contratações?
-3. Existe alguma exigência legal, de conselho de classe ou de vínculo trabalhista que a gente precisa conhecer? *(restrição regulatória: pode virar requisito)*
+3. Existe alguma exigência legal, de conselho de classe ou de vínculo trabalhista que eu preciso conhecer? *(restrição regulatória: pode virar requisito)*
 4. Que tipo de registro do cuidado é considerado boa prática? Existe algum modelo?
 5. Que informação sobre a saúde do idoso um cuidador **pode** e **não pode** acessar?
 6. O que você acha que um app desses erraria?
@@ -197,7 +198,7 @@ Para agência de cuidadores, agente comunitário de saúde, enfermeiro(a) ou ass
 ```
 ID da entrevista: ENT-___          Data: __/__/____      Duração: ___ min
 Perfil: ( ) A Família  ( ) B Cuidador  ( ) C Especialista
-Entrevistador: ____________   Anotador: ____________
+Entrevistador: ____________
 Consentimento: ( ) verbal ( ) assinado    Gravação autorizada: ( ) sim ( ) não
 Contexto do participante (1 linha, sem identificar):
 ______________________________________________________________

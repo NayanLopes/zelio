@@ -41,3 +41,7 @@ docs/entrevistas/brutas/
 
 # Notas de trabalho internas
 docs/resumo-projeto-app-cuidadores.md
+
+# Saidas geradas por ferramenta
+Claude outputs/
+*.pdf

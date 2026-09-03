@@ -15,7 +15,7 @@
 
 ### 1.1 Objetivo
 
-Descrever a estrutura do sistema, as decisões arquiteturais tomadas, as alternativas descartadas e as razões de cada escolha, de forma que a equipe consiga implementar o MVP e que um leitor externo consiga avaliar se a estrutura sustenta os requisitos.
+Descrever a estrutura do sistema, as decisões arquiteturais tomadas, as alternativas descartadas e as razões de cada escolha, de forma que o MVP possa ser implementado e que um leitor externo consiga avaliar se a estrutura sustenta os requisitos.
 
 ### 1.2 Escopo
 
@@ -23,7 +23,9 @@ Cobre o MVP: aplicativo mobile para famílias e cuidadores, backend de negócio 
 
 ### 1.3 Público-alvo do documento
 
-Equipe de desenvolvimento, professora da disciplina e avaliadores do projeto integrado.
+Desenvolvedor do projeto, professora da disciplina e avaliadores do projeto integrado.
+
+> **Sobre a composição da equipe.** O projeto é desenvolvido por uma única pessoa, com autorização da professora. Isso não é um detalhe administrativo: é a restrição RES01, que molda boa parte das decisões deste documento.
 
 ---
 
@@ -35,13 +37,15 @@ Arquitetura não é decidida por requisito funcional, porque funcionalidade quas
 
 | ID | Restrição | Origem |
 |---|---|---|
-| RES01 | Equipe pequena de estudantes, um semestre, sem orçamento de infraestrutura | Contexto da disciplina |
+| RES01 | Um único desenvolvedor, um semestre, sem orçamento de infraestrutura | Contexto da disciplina |
 | RES02 | Alvo Android, mínimo 2 GB de RAM | RNF05 |
 | RES03 | Tratamento de dados pessoais sensíveis (documentos, saúde do idoso) sob a LGPD | RNF06 |
 | RES04 | Interface utilizável por pessoas com baixa familiaridade digital | RNF01 |
 | RES05 | Português do Brasil | RNF04 |
 
 **RES01 é a restrição dominante.** Ela elimina, sozinha, arquiteturas distribuídas, múltiplos bancos de dados e qualquer coisa que exija operação contínua. Toda decisão deste documento é lida primeiro contra ela.
+
+RES01 tem uma segunda consequência, menos óbvia e mais séria: **com um só desenvolvedor não existe revisão por pares**. Todo controle de qualidade que dependeria de uma segunda pessoa olhando o código precisa ser automatizado, ou simplesmente não acontece. Isso aparece nas consequências do ADR-01 e na mitigação do risco R03.
 
 ### 2.2 Requisitos funcionais arquiteturalmente significativos
 
@@ -357,56 +361,56 @@ A interface **confirma o registro localmente antes de sincronizar**. O cuidador 
 
 ### ADR-01: Monólito modular em vez de microsserviços
 
-**Contexto.** Equipe de estudantes, um semestre, sem orçamento nem experiência operacional (RES01).
-**Decisão.** Um único serviço implantável, dividido em módulos com fronteiras de dados explícitas.
+**Contexto.** Um único desenvolvedor, um semestre, sem orçamento nem experiência operacional (RES01).
+**Decisão.** Decidi por um único serviço implantável, dividido em módulos com fronteiras de dados explícitas.
 **Alternativa descartada.** Microsserviços por domínio, que trazem descoberta de serviço, rastreamento distribuído, consistência eventual e múltiplos pipelines. O custo é pago desde o primeiro dia e o benefício (escala independente) não existe no MVP.
-**Consequências.** Deploy e depuração simples; disciplina de fronteira passa a depender de revisão de código, não do runtime. Se a regra "módulo não lê tabela de outro módulo" for quebrada, o monólito vira emaranhado (risco R03).
+**Consequências.** Deploy e depuração simples. Em contrapartida, a disciplina de fronteira não é imposta pelo runtime, e sem revisor humano (RES01) ela também não pode depender de revisão de código: precisa de teste automatizado que falhe o build ao detectar acesso cruzado a tabelas. Se essa verificação não existir, o monólito vira emaranhado (risco R03).
 
 ### ADR-02: React Native + Expo para o app
 
-**Contexto.** Alvo Android com 2 GB de RAM (RES02), equipe pequena, prazo curto, protótipo de alta fidelidade a ser validado com stakeholder.
-**Decisão.** React Native com Expo, em TypeScript.
-**Alternativas.** *Flutter*: desempenho e consistência visual excelentes, mas exigiria Dart, uma linguagem a mais para a equipe aprender, e não compartilha código com o painel admin. *Android nativo (Kotlin)*: melhor desempenho, porém sem reaproveitamento algum e com curva maior. *PWA*: descartada, porque notificação push confiável e acesso a recursos nativos são fracos no Android, e RF09 depende de discagem nativa.
-**Justificativa.** TypeScript unifica app, painel admin e backend, o que em uma equipe pequena vale mais que os ganhos marginais de desempenho do Flutter para um app majoritariamente de formulários e listas. Expo encurta radicalmente o ciclo de build e distribuição de versões de teste, o que é relevante para validar o protótipo com stakeholders reais dentro do semestre.
+**Contexto.** Alvo Android com 2 GB de RAM (RES02), um só desenvolvedor, prazo curto, protótipo de alta fidelidade a ser validado com stakeholder.
+**Decisão.** Decidi usar React Native com Expo, em TypeScript.
+**Alternativas.** *Flutter*: desempenho e consistência visual excelentes, mas exigiria Dart, uma linguagem a mais para aprender, e não compartilha código com o painel admin. *Android nativo (Kotlin)*: melhor desempenho, porém sem reaproveitamento algum e com curva maior. *PWA*: descartada, porque notificação push confiável e acesso a recursos nativos são fracos no Android, e RF09 depende de discagem nativa.
+**Justificativa.** TypeScript unifica app, painel admin e backend, o que para um desenvolvedor sozinho vale mais que os ganhos marginais de desempenho do Flutter para um app majoritariamente de formulários e listas. Expo encurta radicalmente o ciclo de build e distribuição de versões de teste, o que é relevante para validar o protótipo com stakeholders reais dentro do semestre.
 **Consequências.** Atenção a peso do bundle e uso de memória por causa do RNF05 (CQ06); telas de lista precisam de virtualização.
 
 ### ADR-03: Backend próprio em vez de BaaS
 
 **Contexto.** Um BaaS (Firebase, Supabase) entregaria autenticação, banco e storage prontos, economizando semanas.
-**Decisão.** Backend próprio (NestJS + PostgreSQL), usando serviços gerenciados apenas para armazenamento de objetos, push e e-mail.
+**Decisão.** Decidi construir backend próprio (NestJS + PostgreSQL), usando serviços gerenciados apenas para armazenamento de objetos, push e e-mail.
 **Justificativa.** Duas razões. (1) **Acadêmica:** a disciplina avalia projeto e implementação de arquitetura; terceirizar a camada de negócio esvaziaria o objeto de avaliação. (2) **Técnica:** as regras de acesso a dado de saúde (Seção 6) são condicionais a estado de negócio ("durante plantão ativo"), e expressá-las em regras declarativas de BaaS é frágil e difícil de testar; em código de aplicação são explícitas e cobertas por testes.
 **Consequências.** Mais trabalho de infraestrutura e autenticação. Mitigado com biblioteca madura de auth e deploy em plataforma gerenciada (Seção 10).
 
 ### ADR-04: Documentos sensíveis fora do banco, em bucket privado com URL assinada
 
 **Contexto.** RF02 exige upload de antecedentes criminais e certificados; RNF02 e CQ03 exigem proteção.
-**Decisão.** Binários em bucket privado com criptografia em repouso. O banco guarda apenas a chave do objeto e os metadados. Todo acesso é feito por **URL assinada com validade de minutos**, gerada sob autorização da aplicação.
+**Decisão.** Decidi manter os binários em bucket privado com criptografia em repouso. O banco guarda apenas a chave do objeto e os metadados. Todo acesso é feito por **URL assinada com validade de minutos**, gerada sob autorização da aplicação.
 **Alternativas.** *BLOB no PostgreSQL*: infla o banco, complica backup e não separa a classe de dado. *Bucket público com nome aleatório*: segurança por obscuridade; uma URL vazada expõe o documento para sempre.
 **Consequências.** Nenhuma URL permanente de documento existe. Exige rotina de expiração e política de retenção alinhada ao CQ07.
 
 ### ADR-05: Offline-first no painel de acompanhamento
 
 **Contexto.** RF08 é preenchido na casa do idoso, onde a conexão é incerta (a ser quantificado pela pergunta B15).
-**Decisão.** Escrita local primeiro em SQLite, com fila de sincronização e idempotência por chave gerada no cliente.
+**Decisão.** Decidi por escrita local primeiro em SQLite, com fila de sincronização e idempotência por chave gerada no cliente.
 **Alternativa descartada.** Exigir conexão para registrar. Isso transformaria falha de rede em perda de registro de medicação, inaceitável para o domínio, e aumentaria o atrito do cuidador exatamente no ponto mais frágil do produto (hipótese H5).
 **Consequências.** Complexidade de sincronização e necessidade de política de conflito. Mitigação: registros são **append-only** e imutáveis após criação; correção gera novo registro que referencia o anterior. Sem edição concorrente, não há conflito real a resolver.
 
 ### ADR-06: Emergência independente do backend
 
 **Contexto.** RF09 e CQ05. Um botão de emergência que falha junto com o servidor é pior que não ter botão, porque cria falsa confiança.
-**Decisão.** O acionamento dispara **em paralelo**: (a) discagem nativa e SMS para o contato de emergência cadastrado, direto do aparelho, sem passar pelo backend; (b) notificação push e registro de alerta via API, em regime de melhor esforço.
+**Decisão.** Decidi que o acionamento dispara **em paralelo**: (a) discagem nativa e SMS para o contato de emergência cadastrado, direto do aparelho, sem passar pelo backend; (b) notificação push e registro de alerta via API, em regime de melhor esforço.
 **Consequências.** O caminho crítico depende só do aparelho e da rede telefônica. O contato de emergência precisa estar em cache local no dispositivo, sincronizado no início de cada plantão.
 
 ### ADR-07: Verificação de antecedentes manual no MVP
 
 **Contexto.** RF02, RF11 e RN01 dependem de verificar documentos. Integração automatizada com bases oficiais tem custo, contrato e complexidade legal.
-**Decisão.** No MVP, o administrador analisa manualmente pela fila de moderação do painel web. A arquitetura isola essa etapa atrás da interface do módulo Verificação.
+**Decisão.** Decidi manter, no MVP, a análise manual do administrador pela fila de moderação do painel web. A arquitetura isola essa etapa atrás da interface do módulo Verificação.
 **Consequências.** O processo não escala, mas não precisa escalar no MVP, e a fronteira do módulo permite substituir o passo manual por integração externa sem tocar no resto do sistema.
 
 ### ADR-08: Busca por cidade/bairro, não por raio geográfico
 
 **Contexto.** RF04 e CQ01.
-**Decisão.** Filtro por cidade e bairro, com índices B-tree compostos em PostgreSQL. Sem PostGIS, sem cálculo de distância.
+**Decisão.** Decidi filtrar por cidade e bairro, com índices B-tree compostos em PostgreSQL. Sem PostGIS, sem cálculo de distância.
 **Justificativa.** Cuidado domiciliar é contratado por região administrativa, não por distância em quilômetros; e o volume do MVP não justifica índice espacial.
 **Consequências.** Reavaliar se as entrevistas indicarem que famílias raciocinam em termos de deslocamento ("perto do bairro X") em vez de bairro exato.
 
@@ -433,7 +437,7 @@ graph LR
     C1 --> S3
 ```
 
-**Ambientes:** desenvolvimento local (Docker Compose), homologação (usada nas validações com stakeholder) e produção. Pipeline de CI executando lint, testes unitários e testes de integração dos módulos a cada pull request.
+**Ambientes:** desenvolvimento local (Docker Compose), homologação (usada nas validações com stakeholder) e produção. Pipeline de CI executando lint, testes unitários, testes de integração dos módulos e a verificação de fronteiras do R03 a cada push.
 
 ---
 
@@ -472,8 +476,8 @@ graph LR
 |---|---|---|---|
 | R01 | H5 se mostrar falsa: cuidadores rejeitam o registro diário | **Alto**: derruba o diferencial central e boa parte do módulo Acompanhamento | Priorizar as perguntas B11-B14 nas entrevistas; ter plano B (registro por seleção rápida ou áudio, sem digitação) |
 | R02 | Base legal do dado de saúde estar mal enquadrada | Alto: risco de conformidade | Validar com fonte jurídica antes da v2 (Seção 7.3) |
-| R03 | Fronteiras entre módulos erodirem com a pressa do semestre | Médio: o monólito modular vira monólito e só | Revisão de PR checando acesso cruzado a tabelas; teste automatizado de dependência entre módulos |
-| R04 | Verificação manual (ADR-07) travar por indisponibilidade da equipe | Médio: cuidadores não entram no catálogo | SLA interno de 48h e indicador de fila no painel admin |
+| R03 | Fronteiras entre módulos erodirem com a pressa do semestre | Médio: o monólito modular vira monólito e só | Teste automatizado de dependência entre módulos rodando no CI, falhando o build em acesso cruzado a tabelas. Sem revisor humano (RES01), a verificação **precisa** ser automática |
+| R04 | Verificação manual (ADR-07) travar por indisponibilidade do desenvolvedor | Médio: cuidadores não entram no catálogo | SLA interno de 48h e indicador de fila no painel admin |
 | R05 | Chat próprio consumir tempo desproporcional | Médio | Escopo mínimo: texto puro, sem mídia, sem indicador de digitação. Se atrasar, cortar para v2 |
 | R07 | Nome **Zelio** é foneticamente muito próximo do concorrente **Zelo** (webapp do mesmo nicho) | Médio: confusão de marca e risco de conflito de registro | Consultar busca no INPI antes de investir em identidade visual; considerar assinatura que diferencie (ex.: "Zelio Cuidados") |
 | R06 | Base de cuidadores vazia no lançamento (problema do ovo e da galinha) | Alto para o produto, não para a arquitetura | Fora do escopo técnico: tratar na estratégia de validação regional |
