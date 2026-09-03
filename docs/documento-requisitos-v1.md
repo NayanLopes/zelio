@@ -12,7 +12,7 @@
 Este documento apresenta os requisitos funcionais e não funcionais do aplicativo, além dos principais stakeholders, personas e regras de negócio identificados na fase de coleta de dados.
 
 ### 1.2 Descrição geral do produto
-Aplicativo mobile que conecta famílias que precisam de cuidados especializados para idosos a cuidadores autônomos verificados, com foco em **especialização por tipo de cuidado** (ex: Alzheimer, mobilidade reduzida, pós-cirúrgico) e **acompanhamento contínuo da família** durante o serviço. Esses diferenciais não são encontrados de forma dedicada nos concorrentes atuais (Famyle, Zelo).
+Aplicativo mobile que conecta famílias que precisam de cuidados especializados para idosos a cuidadores autônomos verificados, com foco em **especialização por tipo de cuidado** (ex: Alzheimer, mobilidade reduzida, pós-cirúrgico) e **acompanhamento contínuo da família** durante o serviço.
 
 ---
 
@@ -23,7 +23,7 @@ Aplicativo mobile que conecta famílias que precisam de cuidados especializados 
 | Família/Contratante | Responsável pelo idoso, busca e contrata o cuidador |
 | Cuidador | Profissional autônomo que oferece o serviço |
 | Idoso | Beneficiário direto do cuidado (pode ou não interagir com o app) |
-| Administrador da plataforma | Modera cadastros, verifica documentação, trata disputas |
+| Administrador da plataforma | Modera cadastros e verifica documentação |
 
 **Persona 1: Contratante**
 Filho(a) ou responsável, entre 35-60 anos, mora com ou perto do idoso, trabalha em horário comercial e precisa de apoio confiável para cobrir períodos em que não pode estar presente.
@@ -95,7 +95,3 @@ Profissional autônomo, com experiência comprovada, busca flexibilidade de hor�
 - **Painel de acompanhamento**: registro digital preenchido pelo cuidador com informações do dia (medicação, alimentação, intercorrências).
 
 ---
-
-## Próximos passos sugeridos
-- Validar personas e requisitos com pelo menos 2-3 entrevistas reais (famílias e/ou cuidadores) antes da aula 2 (20/08).
-- Priorizar RF08 (painel de acompanhamento) e a especialização por tipo de cuidado como diferenciais centrais na apresentação de arquitetura (aula 3).
