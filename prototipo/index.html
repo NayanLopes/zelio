@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Protótipo Zelio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Public+Sans:wght@400;500;600;700&display=swap">
+
+<style>
+:root{
+  --ground:#FFFFFF; --surface:#FFFFFF; --fill:#F5F7F6; --line:#E2E7E5;
+  --ink:#14201C; --ink-2:#4A5654; --ink-3:#7C8785;
+  --brand:#10635A; --brand-soft:#E6F2F0; --brand-ink:#0B4E46;
+  --ok:#23704A; --ok-soft:#E4F1E9;
+  --warn:#8F6212; --warn-soft:#F7EEDC;
+  --crit:#A32A20; --crit-soft:#F9E5E2;
+  --on-brand:#FFFFFF;
+  --bezel:#101614;
+  --lift:0 1px 3px rgba(20,32,28,.07), 0 12px 28px -18px rgba(20,32,28,.3);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0E1312; --surface:#171E1C; --fill:#1D2523; --line:#2B3432;
+    --ink:#E7EDEB; --ink-2:#AAB5B2; --ink-3:#7E8A87;
+    --brand:#54B4A6; --brand-soft:#183531; --brand-ink:#8FD6CA;
+    --ok:#68BE8E; --ok-soft:#16301F; --warn:#D6A44A; --warn-soft:#312710;
+    --crit:#E37B6F; --crit-soft:#361611;
+    --on-brand:#08201C; --bezel:#05100E;
+    --lift:0 1px 3px rgba(0,0,0,.45), 0 14px 34px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0E1312; --surface:#171E1C; --fill:#1D2523; --line:#2B3432;
+  --ink:#E7EDEB; --ink-2:#AAB5B2; --ink-3:#7E8A87;
+  --brand:#54B4A6; --brand-soft:#183531; --brand-ink:#8FD6CA;
+  --ok:#68BE8E; --ok-soft:#16301F; --warn:#D6A44A; --warn-soft:#312710;
+  --crit:#E37B6F; --crit-soft:#361611;
+  --on-brand:#08201C; --bezel:#05100E;
+  --lift:0 1px 3px rgba(0,0,0,.45), 0 14px 34px -20px rgba(0,0,0,.8);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);
+  font-family:"Public Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.page{max-width:1180px;margin:0 auto;padding-block:44px 64px;
+  padding-left:22px;padding-right:22px}
+
+/* cabeçalho */
+.top{display:flex;flex-wrap:wrap;gap:20px;align-items:baseline;
+  justify-content:space-between}
+.mark{font-family:"Bricolage Grotesque",Georgia,serif;font-weight:700;font-size:31px;
+  letter-spacing:-.025em;color:var(--brand);line-height:1}
+.top .sub{font-size:13.5px;color:var(--ink-3)}
+.lede{margin:20px 0 0;font-size:16.5px;line-height:1.65;color:var(--ink-2);max-width:62ch}
+.lede b{color:var(--ink);font-weight:600}
+
+/* alternador */
+.modes{display:inline-flex;gap:2px;border:1px solid var(--line);border-radius:9px;
+  padding:2px;margin-top:26px}
+.modes button{border:0;background:transparent;font:inherit;font-family:inherit;
+  font-size:13.5px;font-weight:500;padding:6px 15px;border-radius:7px;
+  color:var(--ink-2);cursor:pointer}
+.modes button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand);font-weight:600}
+
+/* seções */
+.part{margin-top:52px}
+.part > h2{font-family:"Bricolage Grotesque",Georgia,serif;font-weight:500;
+  font-size:22px;margin:0;letter-spacing:-.015em;text-wrap:balance}
+.row6{display:grid;gap:40px 30px;margin-top:30px;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.item{display:flex;flex-direction:column;gap:16px;min-width:0}
+.item h3{margin:0;font-size:15.5px;font-weight:600;letter-spacing:-.01em}
+
+/* aparelho */
+.phone{width:100%;max-width:294px;margin-inline:auto;background:var(--bezel);
+  border-radius:34px;padding:8px;box-shadow:var(--lift)}
+.screen{background:var(--surface);border-radius:27px;overflow:hidden;height:590px;
+  display:flex;flex-direction:column;position:relative}
+.sbar{display:flex;justify-content:space-between;align-items:center;
+  padding:9px 18px 2px;font-size:10.5px;font-weight:600;color:var(--ink);flex:none;
+  font-variant-numeric:tabular-nums}
+.sbar .sig{display:flex;gap:2.5px;align-items:flex-end}
+.sbar i{display:block;width:2.5px;border-radius:1px;background:var(--ink)}
+.head{padding:8px 18px 14px;flex:none}
+.head .eyebrow{font-size:10px;color:var(--ink-3);font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase}
+.head h4{margin:2px 0 0;font-size:19px;font-weight:700;letter-spacing:-.025em}
+.view{flex:1;overflow-y:auto;padding:0 18px 18px;display:flex;flex-direction:column;gap:12px}
+.view::-webkit-scrollbar{width:0}
+.view>*{flex:none}
+.tabs{flex:none;display:flex;border-top:1px solid var(--line)}
+.tabs span{flex:1;text-align:center;padding:9px 0 11px;font-size:9px;font-weight:600;
+  color:var(--ink-3);display:flex;flex-direction:column;align-items:center;gap:4px}
+.tabs span.on{color:var(--brand)}
+.tabs span.off{opacity:.34}
+.tabs b{display:block;width:15px;height:15px;border-radius:5px;background:currentColor;opacity:.3}
+.tabs span.on b{opacity:1}
+
+/* peças do app */
+.filters{display:flex;gap:6px;overflow-x:auto;margin:0 -18px;padding-inline:18px}
+.filters::-webkit-scrollbar{height:0}
+.f{flex:none;font-size:11.5px;font-weight:500;padding:7px 12px;border-radius:999px;
+  border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer}
+.f[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);
+  color:var(--on-brand);font-weight:600}
+.label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink-3);margin-top:5px}
+.person{border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;
+  gap:11px;align-items:flex-start;cursor:pointer;background:var(--surface)}
+.person:hover{border-color:var(--brand)}
+.mono{flex:none;width:42px;height:42px;border-radius:14px;background:var(--fill);
+  color:var(--ink-2);display:grid;place-items:center;font-weight:600;font-size:14px;
+  letter-spacing:.02em}
+.person .n{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:5px}
+.person .m{font-size:11.5px;color:var(--ink-3);margin-top:2px;line-height:1.4}
+.person .m b{color:var(--ink);font-weight:600}
+.person .sp{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.sp em{font-style:normal;font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px;
+  background:var(--fill);color:var(--ink-2)}
+.ver{display:inline-grid;place-items:center;width:14px;height:14px;border-radius:50%;
+  background:var(--ok);color:var(--on-brand);font-size:9px;flex:none}
+.panel{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.line{display:flex;gap:11px;align-items:center;padding:11px 13px;
+  border-bottom:1px solid var(--line)}
+.line:last-child{border-bottom:0}
+.line .t{font-size:12.5px;font-weight:500;line-height:1.4}
+.line .s{font-size:11px;color:var(--ink-3);margin-top:1px;line-height:1.4}
+.line .v{margin-left:auto;flex:none;font-size:12px;font-weight:600;
+  font-variant-numeric:tabular-nums}
+.go{width:100%;border:0;border-radius:12px;padding:14px;font:inherit;font-family:inherit;
+  font-size:14.5px;font-weight:600;background:var(--brand);color:var(--on-brand);cursor:pointer}
+.go.alt{background:var(--surface);color:var(--brand);border:1.5px solid var(--line)}
+.go.red{background:var(--crit);color:#fff}
+.pick{display:flex;background:var(--fill);border-radius:12px;padding:3px;gap:3px}
+.pick button{flex:1;border:0;background:transparent;font:inherit;font-family:inherit;
+  font-size:11.5px;font-weight:500;padding:8px 0;border-radius:9px;color:var(--ink-2);
+  cursor:pointer}
+.pick button[aria-pressed="true"]{background:var(--surface);color:var(--ink);
+  font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.sum{display:flex;justify-content:space-between;align-items:baseline;padding:13px;
+  border-radius:13px;background:var(--fill)}
+.sum span{font-size:12.5px;color:var(--ink-2)}
+.sum b{font-size:19px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.quiet{font-size:11.5px;color:var(--ink-3);line-height:1.5;padding:0 2px}
+.state{display:flex;align-items:center;gap:9px;padding:11px 13px;border-radius:13px;
+  background:var(--ok-soft)}
+.beat{width:7px;height:7px;border-radius:50%;background:var(--ok);flex:none;
+  animation:beat 2.6s ease-in-out infinite}
+@keyframes beat{0%,100%{opacity:1}50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.beat{animation:none}}
+.state .t{font-size:12px;font-weight:600;color:var(--ok)}
+.state .s{font-size:10.5px;color:var(--ink-2);font-weight:400}
+.day{display:flex;flex-direction:column}
+.ev{display:flex;gap:11px;position:relative;padding-bottom:15px}
+.ev:last-child{padding-bottom:0}
+.ev::before{content:"";position:absolute;left:5.5px;top:15px;bottom:0;width:1px;
+  background:var(--line)}
+.ev:last-child::before{display:none}
+.pip{flex:none;width:12px;height:12px;border-radius:50%;background:var(--surface);
+  border:2px solid var(--brand);margin-top:3px;z-index:1}
+.pip.mark{border-color:var(--warn)}
+.ev .hr{font-size:10px;color:var(--ink-3);font-weight:600;font-variant-numeric:tabular-nums}
+.ev .ti{font-size:12.5px;font-weight:600;line-height:1.4}
+.ev .de{font-size:11.5px;color:var(--ink-2);line-height:1.45}
+.task{display:flex;gap:12px;align-items:center;padding:12px 13px;
+  border-bottom:1px solid var(--line)}
+.task:last-child{border-bottom:0}
+.mark-btn{flex:none;width:32px;height:32px;border-radius:10px;border:1.5px solid var(--line);
+  background:var(--surface);cursor:pointer;display:grid;place-items:center;
+  color:transparent;font-size:15px;font-weight:700;transition:.14s}
+.mark-btn[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.task.done .t{color:var(--ink-3);text-decoration:line-through}
+.offline{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--warn);
+  font-weight:500;padding:2px}
+.big-red{border:0;border-radius:18px;background:var(--crit);color:#fff;padding:30px 18px;
+  font:inherit;font-family:inherit;font-weight:700;font-size:18px;cursor:pointer;width:100%;
+  display:flex;flex-direction:column;align-items:center;gap:5px;letter-spacing:-.01em}
+.big-red small{font-weight:400;font-size:12px;opacity:.88}
+.chan{display:flex;gap:11px;align-items:flex-start;padding:12px 13px;border-radius:13px;
+  border:1px solid var(--line)}
+.chan .k{flex:none;width:23px;height:23px;border-radius:8px;display:grid;place-items:center;
+  font-size:11.5px;font-weight:700;color:#fff}
+.chan .t{font-size:12.5px;font-weight:600;line-height:1.35}
+.chan .s{font-size:11px;color:var(--ink-2);line-height:1.45;margin-top:2px}
+.gone{display:none!important}
+.cover{position:absolute;inset:0;background:rgba(12,26,22,.5);display:grid;
+  place-items:center;padding:22px;border-radius:27px}
+.cover.gone{display:none}
+.sheet{background:var(--surface);border-radius:18px;padding:20px 17px;text-align:center;
+  display:flex;flex-direction:column;gap:12px;width:100%}
+.sheet .tick{width:42px;height:42px;border-radius:50%;background:var(--ok-soft);
+  color:var(--ok);display:grid;place-items:center;font-size:20px;margin:0 auto}
+.sheet h5{margin:0;font-size:15px;font-weight:700}
+.sheet p{margin:0;font-size:12px;color:var(--ink-2);line-height:1.5}
+
+/* modo navegar */
+.walk{display:none;flex-direction:column;align-items:center;gap:16px;margin-top:26px}
+body[data-mode="walk"] .part{display:none}
+body[data-mode="walk"] .walk{display:flex}
+.walk .phone{max-width:340px}
+.walk .screen{height:clamp(520px,calc(100vh - 320px),690px)}
+.wbar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;justify-content:center}
+.who{display:inline-flex;gap:2px;border:1px solid var(--line);border-radius:9px;padding:2px}
+.who button{border:0;background:transparent;font:inherit;font-family:inherit;font-size:12.5px;
+  font-weight:500;padding:6px 13px;border-radius:7px;color:var(--ink-2);cursor:pointer}
+.who button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand);font-weight:600}
+.rev{border:1px solid var(--line);background:transparent;color:var(--ink-2);font:inherit;
+  font-family:inherit;font-size:12.5px;font-weight:500;padding:6px 13px;border-radius:9px;
+  cursor:pointer}
+.rev:disabled{opacity:.35;cursor:default}
+.wnote{max-width:46ch;text-align:center;font-size:13.5px;color:var(--ink-2)}
+.wnote strong{color:var(--ink);font-weight:600;display:block;margin-bottom:2px}
+
+/* rastreabilidade */
+button:focus-visible,.person:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+@media (max-width:520px){
+  .page{padding-block:30px 48px}.mark{font-size:26px}.lede{font-size:15.5px}
+  .row6{gap:34px 20px}.part{margin-top:40px}
+}
+</style>
+
+</head>
+<body>
+<div class="page">
+
+  <header class="top">
+    <span class="mark">Zelio</span>
+    <span class="sub">Protótipo v1.0 &nbsp;·&nbsp; setembro de 2026</span>
+  </header>
+
+  <p class="lede">Aplicativo que conecta famílias a cuidadores de idosos autônomos
+    verificados. Seis telas do fluxo principal, dos dois lados do serviço.
+    <b>Projeto Integrado em Engenharia de Software III</b> — UFC Campus Quixadá,
+    Profa. Leonara Braz.</p>
+
+  <div class="modes" role="group" aria-label="Modo de visualização">
+    <button id="m-all" aria-pressed="true" onclick="modo('all')">Ver as telas</button>
+    <button id="m-walk" aria-pressed="false" onclick="modo('walk')">Navegar</button>
+  </div>
+
+  <!-- ====== NAVEGAR ====== -->
+  <div class="walk" id="walk">
+    <div class="wbar">
+      <button class="rev" id="rev" onclick="volta()" disabled>&larr; Voltar</button>
+      <div class="who" role="group" aria-label="Lado do aplicativo">
+        <button id="w-fam" aria-pressed="true" onclick="lado('fam')">Família</button>
+        <button id="w-cui" aria-pressed="false" onclick="lado('cui')">Cuidador</button>
+      </div>
+    </div>
+    <div class="phone" id="stage"></div>
+    <div class="wnote" id="wnote"></div>
+  </div>
+
+  <!-- ====== LADO FAMÍLIA ====== -->
+  <section class="part" id="part-fam">
+    <h2>Aplicativo da família</h2>
+
+    <div class="row6">
+
+      <!-- busca -->
+      <div class="item">
+        <div class="phone"><div class="screen" id="t-busca">
+          <div class="sbar"><span>08:14</span>
+            <span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="head"><div class="eyebrow">Quixadá · Centro</div><h4>Encontrar cuidador</h4></div>
+          <div class="view">
+            <div class="filters" role="group" aria-label="Filtrar por especialidade">
+              <button class="f" aria-pressed="true" onclick="filtro(this)">Alzheimer</button>
+              <button class="f" aria-pressed="false" onclick="filtro(this)">Mobilidade reduzida</button>
+              <button class="f" aria-pressed="false" onclick="filtro(this)">Pós-cirúrgico</button>
+              <button class="f" aria-pressed="false" onclick="filtro(this)">Acamado</button>
+            </div>
+            <div class="label">3 cuidadores verificados</div>
+            <div class="person" tabindex="0" data-ir="perfil">
+              <div class="mono">RF</div>
+              <div style="min-width:0">
+                <div class="n">Rosângela Farias <span class="ver">✓</span></div>
+                <div class="m"><b>4,9</b> · 32 avaliações<br>Campo Velho · 8 anos</div>
+                <div class="sp"><em>Alzheimer</em><em>Acamado</em></div>
+              </div>
+            </div>
+            <div class="person" tabindex="0" data-ir="perfil">
+              <div class="mono">CN</div>
+              <div style="min-width:0">
+                <div class="n">Cleide Nascimento <span class="ver">✓</span></div>
+                <div class="m"><b>4,7</b> · 19 avaliações<br>Planalto · 5 anos</div>
+                <div class="sp"><em>Alzheimer</em><em>Diabetes</em></div>
+              </div>
+            </div>
+            <div class="person" tabindex="0" data-ir="perfil">
+              <div class="mono">MA</div>
+              <div style="min-width:0">
+                <div class="n">Mairton Alves <span class="ver">✓</span></div>
+                <div class="m"><b>4,8</b> · 44 avaliações<br>Combate · 11 anos</div>
+                <div class="sp"><em>Alzheimer</em><em>Mobilidade</em></div>
+              </div>
+            </div>
+          </div>
+          <div class="tabs"><span class="on" data-ir="busca"><b></b>Buscar</span>
+            <span data-ir="acomp"><b></b>Plantões</span>
+            <span class="off"><b></b>Mensagens</span><span class="off"><b></b>Perfil</span></div>
+        </div></div>
+        <div><h3>Encontrar cuidador</h3></div>
+      </div>
+
+      <!-- perfil -->
+      <div class="item">
+        <div class="phone"><div class="screen" id="t-perfil">
+          <div class="sbar"><span>08:15</span>
+            <span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="head"><div class="eyebrow">Perfil</div><h4>Rosângela Farias</h4></div>
+          <div class="view">
+            <div class="panel"><div class="line"><div class="mono">RF</div>
+              <div><div class="t">4,9 de 5,0</div><div class="s">32 avaliações · 140 plantões</div></div></div></div>
+            <div class="label">Verificação</div>
+            <div class="panel">
+              <div class="line"><span class="ver">✓</span><div><div class="t">Antecedentes criminais</div>
+                <div class="s">Conferido em 12/08/2026</div></div></div>
+              <div class="line"><span class="ver">✓</span><div><div class="t">Curso de cuidador de idosos</div>
+                <div class="s">SENAC · 160 horas</div></div></div>
+              <div class="line"><span class="ver">✓</span><div><div class="t">Duas referências contactadas</div>
+                <div class="s">Famílias atendidas em 2025</div></div></div>
+            </div>
+            <div class="label">Especialidades</div>
+            <div class="sp"><em>Alzheimer</em><em>Acamado</em><em>Troca de fraldas</em><em>Aferição de sinais</em></div>
+            <div class="label">Valores</div>
+            <div class="panel">
+              <div class="line"><div class="t">Diária de 12 horas</div><div class="v">R$ 140,00</div></div>
+              <div class="line"><div class="t">Hora avulsa</div><div class="v">R$ 22,00</div></div>
+            </div>
+            <button class="go" data-ir="agendar">Solicitar plantão</button>
+            <button class="go alt">Conversar antes</button>
+          </div>
+        </div></div>
+        <div><h3>Perfil verificado</h3></div>
+      </div>
+
+      <!-- agendar -->
+      <div class="item">
+        <div class="phone"><div class="screen" id="t-agendar">
+          <div class="sbar"><span>08:17</span>
+            <span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="head"><div class="eyebrow">Com Rosângela Farias</div><h4>Solicitar plantão</h4></div>
+          <div class="cover gone" id="feito"><div class="sheet">
+            <div class="tick">✓</div><h5>Solicitação enviada</h5>
+            <p>Rosângela tem até 24 horas para responder. O plantão entra na sua agenda
+              quando ela aceitar.</p>
+            <button class="go" data-ir="acomp">Ver meus plantões</button>
+            <button class="go alt" data-ir="voltar-feito">Continuar aqui</button>
+          </div></div>
+          <div class="view">
+            <div class="label">Modalidade</div>
+            <div class="pick" role="group" aria-label="Modalidade">
+              <button aria-pressed="false" onclick="opcao(this)">Horista</button>
+              <button aria-pressed="true" onclick="opcao(this)">Diária</button>
+              <button aria-pressed="false" onclick="opcao(this)">Mensal</button>
+            </div>
+            <div class="label">Quem vai ser cuidado</div>
+            <div class="panel"><div class="line"><div class="mono">AS</div>
+              <div><div class="t">Seu Antônio, 82 anos</div>
+                <div class="s">Alzheimer inicial · anda com apoio</div></div></div></div>
+            <div class="label">Período</div>
+            <div class="panel">
+              <div class="line"><div><div class="t">Segunda a sexta</div>
+                <div class="s">14/09 a 18/09 · 5 diárias</div></div></div>
+              <div class="line"><div><div class="t">07h00 às 19h00</div>
+                <div class="s">12 horas por dia</div></div></div>
+            </div>
+            <div class="sum"><span>Total estimado</span><b>R$ 700,00</b></div>
+            <button class="go" data-ir="enviar">Enviar solicitação</button>
+            <p class="quiet">Rosângela precisa aceitar antes de o plantão ser confirmado.</p>
+          </div>
+        </div></div>
+        <div><h3>Solicitar plantão</h3></div>
+      </div>
+
+      <!-- acompanhamento -->
+      <div class="item">
+        <div class="phone"><div class="screen" id="t-acomp">
+          <div class="sbar"><span>15:42</span>
+            <span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:10px"></i></span></div>
+          <div class="head"><div class="eyebrow">Terça, 15 de setembro</div><h4>Como foi o dia</h4></div>
+          <div class="view">
+            <div class="state"><span class="beat"></span>
+              <div><div class="t">Plantão em andamento</div>
+                <div class="s">Rosângela chegou às 06h58 · atualizado há 4 minutos</div></div></div>
+            <div class="day" style="margin-top:6px">
+              <div class="ev"><span class="pip"></span><div>
+                <div class="hr">08:00</div><div class="ti">Donepezila 10 mg</div>
+                <div class="de">Tomou com o café, sem recusa.</div></div></div>
+              <div class="ev"><span class="pip"></span><div>
+                <div class="hr">08:20</div><div class="ti">Café da manhã</div>
+                <div class="de">Comeu quase tudo. Aceitou a fruta.</div></div></div>
+              <div class="ev"><span class="pip mark"></span><div>
+                <div class="hr">10:30</div><div class="ti">Ficou confuso com o horário</div>
+                <div class="de">Achou que era noite e quis trocar de roupa. Acalmou em
+                  uns 15 minutos.</div></div></div>
+              <div class="ev"><span class="pip"></span><div>
+                <div class="hr">12:10</div><div class="ti">Almoço e Losartana 50 mg</div>
+                <div class="de">Almoçou bem. Pressão 13 por 8.</div></div></div>
+              <div class="ev"><span class="pip"></span><div>
+                <div class="hr">14:00</div><div class="ti">Caminhada no corredor</div>
+                <div class="de">Deu duas voltas com apoio no braço.</div></div></div>
+            </div>
+            <button class="go alt" data-ir="busca">Falar com Rosângela</button>
+          </div>
+          <div class="tabs"><span data-ir="busca"><b></b>Buscar</span>
+            <span class="on" data-ir="acomp"><b></b>Plantões</span>
+            <span class="off"><b></b>Mensagens</span><span class="off"><b></b>Perfil</span></div>
+        </div></div>
+        <div><h3>Acompanhar o dia</h3></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ====== LADO CUIDADOR ====== -->
+  <section class="part" id="part-cui">
+    <h2>Aplicativo do cuidador</h2>
+
+    <div class="row6">
+
+      <!-- registro -->
+      <div class="item">
+        <div class="phone"><div class="screen" id="t-registro">
+          <div class="sbar"><span>12:08</span>
+            <span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:4px;opacity:.28"></i></span></div>
+          <div class="head"><div class="eyebrow">Plantão · Seu Antônio</div><h4>Registrar</h4></div>
+          <div class="view">
+            <div class="offline">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <path d="M2.4 8a5.6 5.6 0 019.3-4.1M13.6 8a5.6 5.6 0 01-9.3 4.1" stroke="currentColor"
+                  stroke-width="1.7" stroke-linecap="round"/></svg>
+              <span>Sem conexão. Salvo no aparelho.</span>
+            </div>
+            <div class="label">Medicações de hoje</div>
+            <div class="panel">
+              <div class="task done"><button class="mark-btn" aria-pressed="true"
+                aria-label="Donepezila registrada" onclick="marcar(this)">✓</button>
+                <div><div class="t">Donepezila 10 mg</div><div class="s">08:00 · registrado 08:02</div></div></div>
+              <div class="task"><button class="mark-btn" aria-pressed="false"
+                aria-label="Registrar Losartana" onclick="marcar(this)">✓</button>
+                <div><div class="t">Losartana 50 mg</div><div class="s">12:00 · com o almoço</div></div></div>
+              <div class="task"><button class="mark-btn" aria-pressed="false"
+                aria-label="Registrar Sinvastatina" onclick="marcar(this)">✓</button>
+                <div><div class="t">Sinvastatina 20 mg</div><div class="s">20:00</div></div></div>
+            </div>
+            <div class="label">Refeições</div>
+            <div class="panel">
+              <div class="task done"><button class="mark-btn" aria-pressed="true"
+                aria-label="Café registrado" onclick="marcar(this)">✓</button>
+                <div><div class="t">Café da manhã</div><div class="s">registrado 08:20</div></div></div>
+              <div class="task"><button class="mark-btn" aria-pressed="false"
+                aria-label="Registrar almoço" onclick="marcar(this)">✓</button>
+                <div><div class="t">Almoço</div><div class="s">toque quando terminar</div></div></div>
+            </div>
+            <button class="go alt">Anotar alguma coisa</button>
+          </div>
+          <div class="tabs"><span class="on" data-ir="registro"><b></b>Registrar</span>
+            <span data-ir="socorro"><b></b>Emergência</span>
+            <span class="off"><b></b>Mensagens</span><span class="off"><b></b>Perfil</span></div>
+        </div></div>
+        <div><h3>Registrar o plantão</h3></div>
+      </div>
+
+      <!-- emergência -->
+      <div class="item">
+        <div class="phone"><div class="screen" id="t-socorro">
+          <div class="sbar"><span>16:31</span>
+            <span class="sig"><i style="height:4px"></i><i style="height:6px"></i><i style="height:8px"></i><i style="height:4px;opacity:.28"></i></span></div>
+          <div class="head"><div class="eyebrow">Plantão · Seu Antônio</div><h4>Emergência</h4></div>
+          <div class="view">
+            <div id="calmo">
+              <button class="big-red" onclick="socorro()">Acionar emergência
+                <small>Segure para confirmar</small></button>
+              <p class="quiet" style="margin-top:12px">A ligação sai pelo seu telefone,
+                mesmo se o aplicativo estiver sem internet.</p>
+            </div>
+            <div id="ativo" class="gone">
+              <div class="label" style="margin-top:0">Acionado às 16:31</div>
+              <div style="display:flex;flex-direction:column;gap:9px;margin-top:8px">
+                <div class="chan"><span class="k" style="background:var(--crit)">1</span>
+                  <div><div class="t">Ligando para Márcia Sousa</div>
+                    <div class="s">Filha · (88) 9 9612-4408</div></div></div>
+                <div class="chan"><span class="k" style="background:var(--crit)">2</span>
+                  <div><div class="t">SMS enviado</div>
+                    <div class="s">Mesmo contato, junto com a ligação</div></div></div>
+                <div class="chan"><span class="k" style="background:var(--warn)">3</span>
+                  <div><div class="t">Avisando pelo aplicativo</div>
+                    <div class="s">Assim que houver sinal</div></div></div>
+              </div>
+              <button class="go alt" style="margin-top:12px" onclick="socorro(1)">Cancelar alerta</button>
+            </div>
+          </div>
+          <div class="tabs"><span data-ir="registro"><b></b>Registrar</span>
+            <span class="on" data-ir="socorro"><b></b>Emergência</span>
+            <span class="off"><b></b>Mensagens</span><span class="off"><b></b>Perfil</span></div>
+        </div></div>
+        <div><h3>Emergência</h3></div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+const FLUXO = {fam:["busca","perfil","agendar","acomp"], cui:["registro","socorro"]};
+const ONDE = {busca:0, perfil:1, agendar:2, acomp:3, registro:4, socorro:5};
+let aqui = "busca", quem = "fam", trilha = [];
+
+function molduras(){ return document.querySelectorAll(".part .phone"); }
+function mostra(id){
+  const el = document.getElementById("t-"+id), palco = document.getElementById("stage");
+  if(palco.firstElementChild && palco.firstElementChild !== el){
+    const fora = palco.firstElementChild;
+    molduras()[ONDE[fora.id.slice(2)]].appendChild(fora);
+  }
+  palco.appendChild(el);
+  aqui = id;
+  const item = document.querySelectorAll(".part .item")[ONDE[id]];
+  document.getElementById("wnote").innerHTML =
+    "<strong>" + item.querySelector("h3").textContent + "</strong>";
+  document.getElementById("rev").disabled = trilha.length === 0;
+  const q = FLUXO.fam.includes(id) ? "fam" : "cui";
+  if(q !== quem){ quem = q; pinta(); }
+}
+function pinta(){
+  document.getElementById("w-fam").setAttribute("aria-pressed", quem === "fam");
+  document.getElementById("w-cui").setAttribute("aria-pressed", quem === "cui");
+}
+function anda(id){ if(id !== aqui) trilha.push(aqui); mostra(id); }
+function volta(){ const p = trilha.pop(); if(p) mostra(p); }
+function lado(q){ quem = q; pinta(); trilha = []; mostra(FLUXO[q][0]); }
+function modo(m){
+  document.body.dataset.mode = m;
+  document.getElementById("m-all").setAttribute("aria-pressed", m === "all");
+  document.getElementById("m-walk").setAttribute("aria-pressed", m === "walk");
+  if(m === "walk"){ trilha = []; mostra(aqui); }
+  else{
+    const palco = document.getElementById("stage");
+    if(palco.firstElementChild){
+      const el = palco.firstElementChild;
+      molduras()[ONDE[el.id.slice(2)]].appendChild(el);
+    }
+  }
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+document.addEventListener("click", e => {
+  if(document.body.dataset.mode !== "walk") return;
+  const alvo = e.target.closest("[data-ir]");
+  if(!alvo) return;
+  const d = alvo.dataset.ir;
+  if(d === "enviar"){ document.getElementById("feito").classList.remove("gone"); return; }
+  if(d === "voltar-feito"){ document.getElementById("feito").classList.add("gone"); return; }
+  document.getElementById("feito").classList.add("gone");
+  anda(d);
+});
+document.body.dataset.mode = "all";
+
+function filtro(b){ b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true"); }
+function opcao(b){ [...b.parentNode.children].forEach(x => x.setAttribute("aria-pressed", "false"));
+  b.setAttribute("aria-pressed", "true"); }
+function marcar(b){
+  const ligado = b.getAttribute("aria-pressed") === "true";
+  b.setAttribute("aria-pressed", ligado ? "false" : "true");
+  b.closest(".task").classList.toggle("done", !ligado);
+  const s = b.closest(".task").querySelector(".s");
+  if(!ligado && s && !s.dataset.antes){
+    s.dataset.antes = s.textContent;
+    const n = new Date();
+    s.textContent = "registrado agora · " + String(n.getHours()).padStart(2,"0")
+      + ":" + String(n.getMinutes()).padStart(2,"0") + " · aguardando sinal";
+  } else if(ligado && s && s.dataset.antes){
+    s.textContent = s.dataset.antes; delete s.dataset.antes;
+  }
+}
+function socorro(cancelar){
+  document.getElementById("calmo").classList.toggle("gone", !cancelar);
+  document.getElementById("ativo").classList.toggle("gone", !!cancelar);
+}
+</script>
+
+</body>
+</html>
