@@ -1,0 +1,176 @@
+### Zelio API — exemplos de uso
+### No VS Code, instale a extensao "REST Client" e clique em "Send Request".
+@base = http://localhost:3000
+
+### Informacoes da API
+GET {{base}}/
+
+### Especialidades disponiveis
+GET {{base}}/especialidades
+
+### ---------- CUIDADORES ----------
+
+### Busca publica (RN01: so devolve aprovados)
+GET {{base}}/cuidadores
+
+### Busca com filtros
+GET {{base}}/cuidadores?especialidade=Alzheimer&cidade=Quixada&nota_minima=4
+
+### Visao administrativa, incluindo quem ainda nao foi aprovado
+GET {{base}}/cuidadores?incluir_nao_aprovados=true
+
+### Um cuidador
+GET {{base}}/cuidadores/1
+
+### Cadastrar cuidador -> 201
+POST {{base}}/cuidadores
+Content-Type: application/json
+
+{
+  "nome": "Teste da Silva",
+  "email": "teste@exemplo.com",
+  "telefone": "(88) 99000-0000",
+  "cidade": "Quixada",
+  "bairro": "Centro",
+  "anos_experiencia": 3,
+  "valor_diaria": 120,
+  "valor_hora": 19,
+  "especialidades": [1, 2]
+}
+
+### Cadastro invalido -> 400 com a lista de problemas
+POST {{base}}/cuidadores
+Content-Type: application/json
+
+{ "nome": "", "email": "nao-e-email", "valor_diaria": "muito" }
+
+### E-mail repetido -> 409
+POST {{base}}/cuidadores
+Content-Type: application/json
+
+{ "nome": "Outro", "email": "teste@exemplo.com", "telefone": "1", "cidade": "Q",
+  "bairro": "C", "valor_diaria": 100, "valor_hora": 15 }
+
+### Atualizar dados
+PATCH {{base}}/cuidadores/1
+Content-Type: application/json
+
+{ "valor_diaria": 150 }
+
+### Administrador aprova o cadastro (RF11, RN01)
+PATCH {{base}}/cuidadores/4/verificacao
+Content-Type: application/json
+
+{ "status_verificacao": "aprovado" }
+
+### Documentos do cuidador
+GET {{base}}/cuidadores/1/documentos
+
+### Enviar documento -> 201
+POST {{base}}/cuidadores/1/documentos
+Content-Type: application/json
+
+{ "tipo": "identidade" }
+
+### Avaliacoes recebidas
+GET {{base}}/cuidadores/3/avaliacoes
+
+### Remover cuidador -> 204, ou 409 se tiver plantao em aberto
+DELETE {{base}}/cuidadores/4
+
+### ---------- FAMILIAS ----------
+
+GET {{base}}/familias
+
+###
+GET {{base}}/familias/1
+
+### Cadastrar familia -> 201
+POST {{base}}/familias
+Content-Type: application/json
+
+{ "responsavel": "Teste Responsavel", "email": "resp@exemplo.com",
+  "telefone": "(88) 99000-1111", "cidade": "Quixada", "bairro": "Centro" }
+
+### Cadastrar idoso da familia -> 201
+POST {{base}}/familias/1/idosos
+Content-Type: application/json
+
+{ "nome": "Dona Maria", "idade": 78, "condicao": "Mobilidade reduzida" }
+
+### Idade fora da faixa -> 400
+POST {{base}}/familias/1/idosos
+Content-Type: application/json
+
+{ "nome": "Crianca", "idade": 10 }
+
+### ---------- PLANTOES ----------
+
+### Todos
+GET {{base}}/plantoes
+
+### Filtrados
+GET {{base}}/plantoes?status=solicitado
+###
+GET {{base}}/plantoes?cuidador_id=1
+###
+GET {{base}}/plantoes?familia_id=1
+
+### Solicitar plantao -> 201. O valor total e calculado pelo servidor.
+POST {{base}}/plantoes
+Content-Type: application/json
+
+{
+  "cuidador_id": 2,
+  "idoso_id": 1,
+  "modalidade": "diaria",
+  "data_inicio": "2026-11-09",
+  "data_fim": "2026-11-13",
+  "hora_inicio": "07:00",
+  "hora_fim": "19:00"
+}
+
+### Cuidador nao aprovado -> 409 (RN01)
+POST {{base}}/plantoes
+Content-Type: application/json
+
+{ "cuidador_id": 4, "idoso_id": 1, "modalidade": "diaria", "data_inicio": "2026-12-01",
+  "data_fim": "2026-12-02", "hora_inicio": "08:00", "hora_fim": "18:00" }
+
+### Pular de solicitado para concluido -> 409 (RN02)
+PATCH {{base}}/plantoes/2/status
+Content-Type: application/json
+
+{ "status": "concluido" }
+
+### Cuidador aceita -> 200 (RN02)
+PATCH {{base}}/plantoes/2/status
+Content-Type: application/json
+
+{ "status": "aceito" }
+
+### Concluir
+PATCH {{base}}/plantoes/2/status
+Content-Type: application/json
+
+{ "status": "concluido" }
+
+### ---------- AVALIACOES ----------
+
+### Avaliar plantao concluido -> 201 (RN03)
+POST {{base}}/plantoes/1/avaliacoes
+Content-Type: application/json
+
+{ "autor": "familia", "nota": 5, "comentario": "Muito atencioso." }
+
+### Nota fora de 1 a 5 -> 400
+POST {{base}}/plantoes/1/avaliacoes
+Content-Type: application/json
+
+{ "autor": "cuidador", "nota": 9 }
+
+### Avaliacoes de um plantao
+GET {{base}}/plantoes/1/avaliacoes
+
+### Rota que nao existe -> 404
+GET {{base}}/nao-existe
