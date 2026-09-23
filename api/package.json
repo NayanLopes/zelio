@@ -1,0 +1,19 @@
+{
+  "name": "zelio-api",
+  "version": "1.0.0",
+  "description": "API REST do Zelio, marketplace que conecta familias a cuidadores de idosos autonomos",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "db:reset": "node src/db/seed.js",
+    "test": "node --test testes/regras.test.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "better-sqlite3": "^11.3.0"
+  },
+  "license": "MIT"
+}
