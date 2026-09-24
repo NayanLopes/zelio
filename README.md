@@ -19,7 +19,20 @@ aplicativo.
 |---|---|
 | [`api/`](api/) | API REST em Node.js e Express, com banco SQLite |
 | [`docs/`](docs/) | Documentos de engenharia e de idealização |
-| [`prototipo/`](prototipo/) | Protótipo navegável das telas |
+| [`prototipo/`](prototipo/) | Protótipo das telas |
+
+## Protótipo
+
+Protótipo navegável das oito telas, com o fluxo ligado:
+**[abrir no Figma](https://www.figma.com/proto/0G8ldhOI6LclbkswGdjXa2/Zelio-v1?node-id=3-1102)**
+
+A navegação cobre os dois lados do aplicativo. Do lado da família: busca, perfil,
+conversa, solicitação, lista de plantões e avaliação. Do lado do cuidador:
+solicitações recebidas e o cadastro em análise. O mapa de cada tela para o endpoint
+que ela chama está em [`docs/telas-e-endpoints.md`](docs/telas-e-endpoints.md).
+
+A pasta [`prototipo/`](prototipo/) guarda a primeira rodada, em HTML, feita antes da
+redução de escopo. Está mantida como registro; a versão válida é a do Figma.
 
 ## Documentação
 
