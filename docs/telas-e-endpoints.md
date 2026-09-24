@@ -2,6 +2,8 @@
 
 Telas principais, fluxo de navegação e a ligação de cada tela com os endpoints da API.
 
+Protótipo navegável: **[Zelio v1 no Figma](https://www.figma.com/proto/0G8ldhOI6LclbkswGdjXa2/Zelio-v1?node-id=3-1102)**
+
 ## Fluxo de navegação
 
 **Aplicativo da família**
