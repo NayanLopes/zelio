@@ -40,15 +40,16 @@ redução de escopo. Está mantida como registro; a versão válida é a do Figm
 |---|---|
 | [`docs/proposta-mobile.md`](docs/proposta-mobile.md) | Problema, público-alvo, funcionalidades e entidades |
 | [`docs/telas-e-endpoints.md`](docs/telas-e-endpoints.md) | Telas, fluxo de navegação e o endpoint que cada tela chama |
-| [`docs/documento-requisitos-v1.md`](docs/documento-requisitos-v1.md) | Requisitos funcionais e não funcionais, personas, regras de negócio |
-| [`docs/documento-arquitetura-v1.md`](docs/documento-arquitetura-v1.md) | Drivers, visões C4, modelo de dados, decisões de arquitetura |
-| [`docs/roteiro-entrevistas-v1.md`](docs/roteiro-entrevistas-v1.md) | Roteiro de coleta de dados com stakeholders |
+| [`docs/documento-requisitos-v2.md`](docs/documento-requisitos-v2.md) | Requisitos funcionais e não funcionais, personas, regras de negócio |
+| [`docs/documento-arquitetura-v2.md`](docs/documento-arquitetura-v2.md) | Drivers, visões C4, modelo de dados, decisões de arquitetura |
+| [`docs/roteiro-entrevistas-v2.md`](docs/roteiro-entrevistas-v2.md) | Roteiro de coleta de dados com stakeholders |
+| [`docs/gestao-do-projeto.md`](docs/gestao-do-projeto.md) | Escopo, cronograma planejado e realizado, replanejamento |
+| [`docs/validacao/`](docs/validacao/) | Registros das conversas com stakeholders |
 | [`api/README.md`](api/README.md) | Endpoints, regras de negócio e códigos de status da API |
 
-> **Nota de escopo.** O projeto foi reduzido para o modelo de marketplace descrito
-> acima. Os documentos de requisitos, arquitetura e roteiro de entrevistas ainda
-> descrevem o escopo anterior, que incluía acompanhamento do serviço em andamento,
-> e estão em revisão.
+> **Nota de escopo.** O projeto foi reduzido ao modelo de marketplace descrito
+> acima. A v2 dos três documentos de engenharia aplica esse corte e registra, em
+> cada um, o que saiu e por quê. A v1 continua no histórico do repositório.
 
 ## Rodando a API
 

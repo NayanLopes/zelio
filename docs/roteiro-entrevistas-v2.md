@@ -1,22 +1,40 @@
 # Roteiro de Entrevistas: Coleta de Dados com Stakeholders
 
-## Zelio: App de Freelance de Cuidadores de Idosos
+## Zelio: marketplace de cuidadores de idosos
 
 **Disciplina:** Projeto Integrado em Engenharia de Software III
 **Professora:** Leonara Braz (2026.2, UFC Campus Quixadá)
-**Versão:** 1.0
-**Documento relacionado:** `documento-requisitos-v1.md`
+**Aluno:** Vitor Nayan
+**Versão:** 2.0
+**Documento relacionado:** `documento-requisitos-v2.md`
+
+---
+
+## Histórico de versões
+
+| Versão | Data | O que mudou |
+|---|---|---|
+| v1 | 20/08/2026 | Primeira versão, com sete hipóteses |
+| v2 | 28/10/2026 | Saíram H2 e H5, que testavam o painel de acompanhamento, junto dos blocos de pergunta ligados a ele. Entraram H8 e H9. O bloco de apresentação da solução foi reescrito para o produto atual |
+
+H2 e H5 testavam funcionalidades que não existem mais. Perguntar sobre elas
+gastaria o tempo da entrevista, que é curto, com algo que não decide nada.
 
 ---
 
 ## 1. Objetivo da coleta
 
-Validar (ou refutar) as suposições que sustentam o documento de requisitos v1. Hoje esse documento é um **rascunho baseado em pesquisa de concorrentes**, não em evidência de campo: todas as personas e boa parte dos requisitos funcionais estão marcados como "a validar".
+Validar ou refutar as suposições que sustentam o documento de requisitos. Ele
+continua sendo um documento **baseado em pesquisa de concorrentes e raciocínio
+sobre o domínio**, não em evidência de campo: as duas personas seguem marcadas
+como a validar.
 
 A coleta responde a três perguntas:
 
-1. O problema pressuposto pelo projeto é real, e é doloroso o suficiente para alguém mudar de comportamento?
-2. Os diferenciais definidos (especialização por tipo de cuidado e painel de acompanhamento) importam para quem vai usar?
+1. O problema pressuposto pelo projeto é real, e é doloroso o suficiente para
+   alguém mudar de comportamento?
+2. Os diferenciais definidos — especialização por tipo de cuidado e verificação
+   antes da vitrine — importam para quem vai usar?
 3. Quais requisitos estão faltando, sobrando ou mal priorizados?
 
 ### 1.1 Hipóteses a testar
@@ -26,14 +44,23 @@ Cada hipótese está ligada aos requisitos que caem se ela for falsa. Isso é o 
 | ID | Hipótese | Se for falsa, afeta |
 |---|---|---|
 | H1 | A maior barreira da família ao contratar um cuidador é **confiança/segurança**, não preço nem disponibilidade | RF02, RF11, RN01 |
-| H2 | Famílias querem **acompanhar o plantão em tempo quase real** e isso as faria escolher um app em vez de indicação | RF08 (diferencial central) |
 | H3 | A escolha do cuidador passa por **especialidade clínica** (Alzheimer, mobilidade, pós-cirúrgico), não só por preço e disponibilidade | RF01, RF04 (diferencial central) |
 | H4 | Cuidadores hoje dependem de **boca a boca** e têm ociosidade involuntária entre plantões | Proposta de valor do lado da oferta |
-| H5 | Cuidadores **aceitariam preencher** um registro diário estruturado sem que isso vire motivo de abandono do app | RF08: **hipótese de maior risco** |
 | H6 | Existe disposição a pagar (família) ou a ceder comissão (cuidador) por intermediação | Modelo de negócio |
 | H7 | Parte relevante das famílias contratantes tem **baixa familiaridade digital** | RNF01, RNF05 |
+| H8 | A verificação feita por uma plataforma **substitui, na prática, o peso da indicação pessoal** na decisão da família | RF02, RF11, RN01: **hipótese de maior risco** |
+| H9 | A família quer **conversar com o cuidador antes de contratar**, e é nessa conversa que a decisão se fecha | RF05 |
 
-> **Sobre H5:** o painel de acompanhamento (RF08) é o principal diferencial do projeto, mas ele transfere trabalho para o cuidador, que não é quem paga. Se cuidadores acharem o registro burocrático, o diferencial morre na prática mesmo que a família adore a ideia. Essa é a hipótese que mais merece atenção nas entrevistas do lado da oferta.
+> **Sobre H8.** Com o corte de escopo, a hipótese de maior risco mudou de lado.
+> Antes era H5, sobre o cuidador aceitar preencher o registro diário. Agora é H8,
+> e ela é mais fundamental: o produto inteiro aposta que um selo de verificação
+> pode ocupar o lugar que hoje é da indicação de um conhecido. Se a família disser
+> "eu só contrato quem alguém que eu conheço indicou", o marketplace não tem como
+> existir na forma projetada — nem a busca, nem a verificação, nem a reputação
+> resolvem. É a primeira coisa a investigar, e a mais desconfortável de ouvir.
+>
+> H2 e H5 saíram da lista na v2. As duas testavam o painel de acompanhamento, que
+> deixou de fazer parte do produto.
 
 ---
 
@@ -112,12 +139,12 @@ O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que
 10. O que deu errado nessa contratação, ou o que vocês fariam diferente?
 11. Já aconteceu de precisar de alguém de última hora, ou do cuidador faltar? Como resolveram? *(RF10)*
 
-### Bloco 3: Acompanhamento (10 min) *(testa o diferencial)*
+### Bloco 3: Confiança e verificação (10 min) *(testa H8, a hipótese de maior risco)*
 
-12. Nos dias em que o cuidador está lá e você não está, **como você fica sabendo** o que aconteceu? *(H2)*
-13. Tem alguma coisa que você gostaria de saber e hoje não sabe? *(H2)*
-14. Já teve alguma situação de emergência ou susto durante um plantão? Como foi? *(RF09)*
-15. Alguém registra medicação ou alimentação de alguma forma? Caderno, WhatsApp, nada? *(H2, RF08)*
+12. Fora essa pessoa, você considerou alguém que **não** tinha sido indicado por conhecido? O que aconteceu? *(H8)*
+13. Imagina que você não tivesse ninguém para indicar. O que você faria? *(H8: deixe a pessoa pensar, não ofereça o app como saída)*
+14. O que precisaria estar comprovado sobre alguém desconhecido para você deixar essa pessoa sozinha com [o idoso]? *(H8: essa é a pergunta central da entrevista)*
+15. Você já contratou algum serviço para dentro de casa por aplicativo? Diarista, montador, cuidador? Como foi? *(H8: comportamento passado vale mais que opinião)*
 
 ### Bloco 4: Especialização (5 min)
 
@@ -126,13 +153,14 @@ O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que
 
 ### Bloco 5: Reação à solução (5 min) *(só agora)*
 
-> "Deixa eu te contar o que estou pensando: um aplicativo onde você encontra cuidadores verificados, filtrando por especialidade, e onde o cuidador registra no celular o que aconteceu no dia (medicação, alimentação, intercorrências) e você acompanha de onde estiver."
+> "Deixa eu te contar o que estou pensando: um aplicativo onde você encontra cuidadores de idosos que já tiveram antecedentes, curso e referências conferidos antes de aparecer ali. Você filtra por tipo de cuidado, conversa com a pessoa pelo aplicativo antes de decidir, e combina o plantão por lá. O serviço em si acontece normalmente, fora do aplicativo, e no fim vocês dois se avaliam."
 
 18. O que passou pela sua cabeça agora?
 19. O que nisso não te convence, ou o que te preocuparia? *(pergunte explicitamente pelo negativo)*
-20. Se isso existisse na última vez, você teria usado? Por quê? *(H2)*
-21. Quem na sua família conseguiria usar um app desses sozinho? *(H7, RNF01)*
-22. Tem alguém que você acha que eu deveria conversar sobre isso?
+20. Se isso existisse na última vez, você teria usado? Por quê? *(H8)*
+21. Você conversaria com a pessoa antes de contratar, ou contrataria direto pelo perfil? *(H9)*
+22. Quem na sua família conseguiria usar um app desses sozinho? *(H7, RNF01)*
+23. Tem alguém que você acha que eu deveria conversar sobre isso?
 
 ---
 
@@ -154,29 +182,30 @@ O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que
 9. Como funciona a combinação de valor e pagamento? Já teve calote ou atraso?
 10. Já recusou um trabalho? Por quê? *(entender critérios do lado da oferta)*
 
-### Bloco 3: Rotina e registro (10 min) *(testa H5, a hipótese mais arriscada)*
+### Bloco 3: Confiança e verificação (10 min)
 
-11. Durante o plantão, você anota alguma coisa? Medicação, alimentação, como o idoso passou? *(H5)*
-12. Como você passa para a família o que aconteceu no dia? *(H5: sondar conversa na troca, WhatsApp, caderno)*
-13. Quanto tempo isso te toma?
-14. Se um app pedisse para você registrar isso, tipo marcar que deu o remédio das 14h, **isso te ajudaria ou te atrapalharia**? Por quê? *(H5: pergunta central; não sugerir a resposta)*
-15. Em quantos plantões você tem internet boa na casa do cliente? *(restrição de arquitetura: offline)*
-16. Já teve emergência durante um plantão? O que você fez? *(RF09)*
+11. As famílias costumam pedir documento, antecedentes, referência? Como é isso? *(H1, H8, RF02)*
+12. Como você faz hoje para uma família que não te conhece confiar em você? *(H8: do outro lado do balcão)*
+13. Você se incomodaria em mandar antecedentes criminais e certificados para um aplicativo aprovar seu cadastro antes de você aparecer na busca? *(RF02, RF11)*
+14. E esperar alguns dias por essa aprovação, sem poder trabalhar pelo app nesse tempo? *(RN01: o custo real da verificação)*
+15. Ser avaliado com nota pelas famílias, como você vê? *(RF07)*
+16. Você avaliaria a família também? Isso faria diferença? *(RF07: avaliação mútua)*
 
-### Bloco 4: Confiança e verificação (5 min)
+### Bloco 4: Combinação e recusa (5 min)
 
-17. As famílias costumam pedir documento, antecedentes, referência? Como é isso? *(H1, RF02)*
-18. Você se incomodaria em mandar antecedentes criminais e certificados para um app aprovar seu cadastro? *(RF02, RF11)*
-19. E ser avaliado com nota pelas famílias, como você vê? *(RF07)*
+17. Quando uma família te procura, o que você pergunta antes de aceitar? *(H9, RF05)*
+18. Já recusou um trabalho depois de conversar? O que te fez recusar? *(entender os critérios do lado da oferta)*
+19. Quanto tempo costuma passar entre o primeiro contato e o primeiro dia de trabalho?
 
 ### Bloco 5: Reação à solução (5 min)
 
-> "Estou pensando em um app onde você monta um perfil com suas especialidades, passa por uma verificação, e as famílias te encontram e contratam por ele. Durante o plantão você registra no celular o que aconteceu e a família acompanha."
+> "Estou pensando em um aplicativo onde você monta um perfil com suas especialidades e seus valores, manda seus documentos uma vez para serem conferidos, e depois disso as famílias te encontram pela busca. Elas te chamam, vocês conversam por ali, e se fizer sentido elas mandam uma solicitação de plantão que **você aceita ou recusa**. O serviço acontece normalmente, fora do aplicativo."
 
 20. O que você acha disso?
 21. O que te faria **não** usar? *(pergunte pelo negativo)*
-22. Se o app cobrasse uma porcentagem do valor do plantão, isso faria sentido para você? Quanto seria demais? *(H6)*
-23. Tem colega cuidador com quem eu poderia conversar?
+22. Ter que aceitar ou recusar cada solicitação te parece bom ou chato? *(RN02: valida a regra central do sistema)*
+23. Se o app cobrasse uma porcentagem do valor do plantão, isso faria sentido para você? Quanto seria demais? *(H6)*
+24. Tem colega cuidador com quem eu poderia conversar?
 
 ---
 
@@ -187,8 +216,8 @@ Para agência de cuidadores, agente comunitário de saúde, enfermeiro(a) ou ass
 1. Como as famílias da região costumam encontrar cuidadores hoje?
 2. Que problemas você vê acontecerem com mais frequência nessas contratações?
 3. Existe alguma exigência legal, de conselho de classe ou de vínculo trabalhista que eu preciso conhecer? *(restrição regulatória: pode virar requisito)*
-4. Que tipo de registro do cuidado é considerado boa prática? Existe algum modelo?
-5. Que informação sobre a saúde do idoso um cuidador **pode** e **não pode** acessar?
+4. Que informação sobre a saúde do idoso um cuidador **pode** e **não pode** receber antes de aceitar um trabalho? *(RNF06, define o limite do campo de condição)*
+5. Na sua experiência, família aceita contratar alguém que não foi indicado por conhecido? O que muda a resposta? *(H8)*
 6. O que você acha que um app desses erraria?
 
 ---
@@ -209,7 +238,7 @@ Solução atual (o que a pessoa faz hoje): _____________________
 Citação literal marcante: "____________________________________"
 
 VEREDITO DAS HIPÓTESES  (C = confirmou | R = refutou | N = não abordado)
-H1 ___  H2 ___  H3 ___  H4 ___  H5 ___  H6 ___  H7 ___
+H1 ___  H3 ___  H4 ___  H6 ___  H7 ___  H8 ___  H9 ___
 
 IMPACTO NOS REQUISITOS
 Requisito que ganhou força: ___________________________________
@@ -224,17 +253,22 @@ Surpresa (algo que não estava no nosso mapa): _________________
 
 | Pergunta | Hipótese | Requisito impactado |
 |---|---|---|
-| A7, A8, B17, B18 | H1 | RF02, RF11, RN01, RNF02 |
-| A12, A13, A15, B11, B12, B14 | H2, H5 | **RF08** |
-| A14, B16 | - | RF09 |
+| A7, A8, B11 | H1 | RF02, RF11, RN01, RNF02 |
+| A12, A13, A14, A15, A20, B12, C5 | **H8** | **RF02, RF11, RN01** |
 | A16, A17 | H3 | **RF01, RF04** |
+| A21, B17 | H9 | RF05 |
 | A11 | - | RF10 |
 | B4, B5, B6, B7 | H4 | Proposta de valor (oferta) |
-| B15 | - | Restrição de arquitetura (operação offline) |
-| A9, B22 | H6 | Modelo de negócio |
-| A21 | H7 | RNF01, RNF05 |
-| B19 | - | RF07, RN04 |
-| C3, C5 | - | RNF06 (LGPD), possíveis requisitos legais novos |
+| B13, B14 | - | RF02, RF11, RN01 |
+| B15, B16 | - | RF07, RN03, RN04 |
+| B22 | - | **RN02** |
+| A9, B23 | H6 | Modelo de negócio |
+| A22 | H7 | RNF01, RNF05 |
+| C3, C4 | - | RNF06 (LGPD), possíveis requisitos legais novos |
+
+A linha de H8 é a mais larga da matriz de propósito: sete perguntas, nos três
+roteiros, cercando a mesma hipótese por ângulos diferentes. É o que se faz com a
+hipótese de maior risco — não se pergunta uma vez e se dá por satisfeito.
 
 ---
 
@@ -243,8 +277,9 @@ Surpresa (algo que não estava no nosso mapa): _________________
 1. **Transcrever/organizar notas** em até 24h de cada entrevista, enquanto a memória ajuda.
 2. **Análise de afinidade:** recortar cada achado em um post-it (físico ou Miro/FigJam) e agrupar por tema. Temas que aparecem em 3+ entrevistas viram requisito; os que aparecem em 1 viram observação.
 3. **Fechar o veredito das hipóteses** em uma tabela consolidada: confirmada, refutada ou inconclusiva, com a evidência (citação + ID da entrevista).
-4. **Atualizar o documento de requisitos para v2:** ajustar personas com dados reais, repriorizar RF01-RF12, registrar requisitos novos e mover para "fora de escopo" o que não se sustentou.
-5. **Registrar no documento a origem de cada mudança** (ex.: "RF08 repriorizado para Média após ENT-03 e ENT-05"). Rastreabilidade da evidência até o requisito é exatamente o que a disciplina cobra.
+4. **Atualizar o documento de requisitos para v3:** ajustar personas com dados reais, repriorizar os requisitos, registrar requisitos novos e mover para fora de escopo o que não se sustentou.
+5. **Registrar no documento a origem de cada mudança** (por exemplo: "RF05 repriorizado para Alta após ENT-02 e ENT-04"). A rastreabilidade da evidência até o requisito é exatamente o que a disciplina cobra.
+6. **Guardar a ficha preenchida** em `docs/validacao/`, uma por entrevista, anonimizada. A ficha é entregável de sprint review, e não anotação pessoal.
 
 ---
 
