@@ -3,7 +3,6 @@ const AppError = require('../erros/AppError');
 const repo = require('../repositorios/avisos');
 const plantoes = require('./plantoes');
 
-// RF10, RN05
 const ESTADO_QUE_ACEITA_AVISO = 'aceito';
 
 function criar(plantaoId, dados) {

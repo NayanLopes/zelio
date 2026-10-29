@@ -14,7 +14,6 @@ function montar(linha) {
   };
 }
 
-// RN01
 function listar(filtros = {}) {
   let lista = repo.listar(filtros, !filtros.incluir_nao_aprovados).map(montar);
   if (filtros.nota_minima !== undefined) {
@@ -55,7 +54,6 @@ function atualizar(id, dados) {
   return buscarPorId(id);
 }
 
-// RF11
 function definirVerificacao(id, status) {
   buscarPorId(id);
   repo.definirStatusVerificacao(id, status);
