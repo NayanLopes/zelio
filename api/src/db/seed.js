@@ -41,21 +41,27 @@ const f2 = Number(insFam.run('Antonio Ribeiro', 'antonio@exemplo.com', '(88) 996
 
 const insIdo = db.prepare('INSERT INTO idosos (familia_id, nome, idade, condicao) VALUES (?, ?, ?, ?)');
 const i1 = Number(insIdo.run(f1, 'Antonio Sousa', 82, 'Alzheimer inicial, anda com apoio').lastInsertRowid);
-insIdo.run(f2, 'Cicera Ribeiro', 79, 'Mobilidade reduzida apos cirurgia de quadril');
+const i2 = Number(insIdo.run(f2, 'Cicera Ribeiro', 79, 'Mobilidade reduzida apos cirurgia de quadril').lastInsertRowid);
 
 const insPl = db.prepare(`INSERT INTO plantoes
   (cuidador_id, idoso_id, modalidade, data_inicio, data_fim, hora_inicio, hora_fim, valor_total, status)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
 const p1 = Number(insPl.run(3, i1, 'diaria', '2026-09-01', '2026-09-05', '07:00', '19:00', 800, 'concluido').lastInsertRowid);
 insPl.run(1, i1, 'diaria', '2026-10-14', '2026-10-18', '07:00', '19:00', 700, 'solicitado');
+// plantao aceito, usado para demonstrar o aviso de atraso (RF10)
+const p3 = Number(insPl.run(2, i2, 'diaria', '2026-11-22', '2026-11-22', '07:00', '19:00', 660, 'aceito').lastInsertRowid);
 
 db.prepare('INSERT INTO avaliacoes (plantao_id, autor, nota, comentario) VALUES (?, ?, ?, ?)')
   .run(p1, 'familia', 5, 'Muito atencioso com meu pai. Chegou no horario todos os dias.');
 db.prepare('INSERT INTO avaliacoes (plantao_id, autor, nota, comentario) VALUES (?, ?, ?, ?)')
   .run(p1, 'cuidador', 5, 'Familia organizada, deixou tudo combinado.');
 
+// RF10 — o mesmo aviso que a tela "Meus plantoes" mostra em destaque
+db.prepare('INSERT INTO avisos (plantao_id, tipo, minutos_atraso, mensagem) VALUES (?, ?, ?, ?)')
+  .run(p3, 'atraso', 40, 'Consulta medica da manha atrasou. Chego 40 minutos depois.');
+
 const conta = (t) => db.prepare(`SELECT COUNT(*) AS n FROM ${t}`).get().n;
 console.log(`Banco recriado em ${arquivo} (driver: ${driver})`);
-for (const t of ['especialidades', 'cuidadores', 'familias', 'idosos', 'plantoes', 'avaliacoes']) {
+for (const t of ['especialidades', 'cuidadores', 'familias', 'idosos', 'plantoes', 'avaliacoes', 'avisos']) {
   console.log(`  ${t.padEnd(16)} ${conta(t)}`);
 }

@@ -24,7 +24,11 @@ function montar(linha) {
   const cuidador = db.prepare('SELECT id, nome, cidade, bairro FROM cuidadores WHERE id = ?').get(linha.cuidador_id);
   const avaliacoes = db.prepare('SELECT id, autor, nota, comentario, criado_em FROM avaliacoes WHERE plantao_id = ?')
     .all(linha.id);
-  return { ...linha, idoso, cuidador, avaliacoes,
+  // RF10 — a lista de plantoes da familia mostra o aviso em destaque, entao
+  // ele vem junto do plantao e nao exige uma segunda requisicao por item.
+  const avisos = db.prepare('SELECT id, tipo, minutos_atraso, mensagem, criado_em FROM avisos WHERE plantao_id = ? ORDER BY criado_em DESC')
+    .all(linha.id);
+  return { ...linha, idoso, cuidador, avaliacoes, avisos,
            proximos_status: TRANSICOES[linha.status] };
 }
 
