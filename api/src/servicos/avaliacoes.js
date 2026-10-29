@@ -3,7 +3,6 @@ const AppError = require('../erros/AppError');
 const repo = require('../repositorios/avaliacoes');
 const plantoes = require('./plantoes');
 
-// RN03
 function criar(plantaoId, dados) {
   const p = plantoes.buscarPorId(plantaoId);
   if (p.status !== 'concluido') {

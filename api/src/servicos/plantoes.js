@@ -6,7 +6,6 @@ const avisosRepo = require('../repositorios/avisos');
 const cuidadores = require('./cuidadores');
 const familias = require('./familias');
 
-// RN02
 const TRANSICOES = {
   solicitado: ['aceito', 'recusado', 'cancelado'],
   aceito:     ['concluido', 'cancelado'],
@@ -60,7 +59,6 @@ function criar(dados) {
   const cuidador = cuidadores.buscarPorId(dados.cuidador_id);
   familias.buscarIdoso(dados.idoso_id);
 
-  // RN01
   if (cuidador.status_verificacao !== 'aprovado') {
     throw AppError.conflito('Este cuidador ainda nao foi aprovado pelo administrador');
   }
