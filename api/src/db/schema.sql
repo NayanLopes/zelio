@@ -1,5 +1,6 @@
 PRAGMA foreign_keys = ON;
 
+DROP TABLE IF EXISTS avisos;
 DROP TABLE IF EXISTS avaliacoes;
 DROP TABLE IF EXISTS plantoes;
 DROP TABLE IF EXISTS idosos;
@@ -96,6 +97,23 @@ CREATE TABLE avaliacoes (
   criado_em  TEXT    NOT NULL DEFAULT (datetime('now')),
   UNIQUE (plantao_id, autor)
 );
+
+-- RF10: o cuidador avisa a familia de atraso ou cancelamento.
+-- RN05: so plantao aceito aceita aviso. Antes do aceite nao ha compromisso
+-- a quebrar; depois de encerrado nao ha mais o que avisar.
+CREATE TABLE avisos (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,
+  plantao_id     INTEGER NOT NULL REFERENCES plantoes(id) ON DELETE CASCADE,
+  tipo           TEXT    NOT NULL CHECK (tipo IN ('atraso','cancelamento')),
+  -- so faz sentido em aviso de atraso; o servico recusa nos demais
+  minutos_atraso INTEGER CHECK (minutos_atraso IS NULL OR minutos_atraso BETWEEN 1 AND 720),
+  mensagem       TEXT,
+  criado_em      TEXT    NOT NULL DEFAULT (datetime('now')),
+  CHECK ((tipo = 'atraso' AND minutos_atraso IS NOT NULL)
+      OR (tipo = 'cancelamento' AND minutos_atraso IS NULL))
+);
+
+CREATE INDEX idx_avisos_plantao ON avisos (plantao_id, criado_em);
 
 CREATE INDEX idx_cuidadores_busca  ON cuidadores (status_verificacao, cidade, bairro);
 CREATE INDEX idx_plantoes_cuidador ON plantoes (cuidador_id, status);

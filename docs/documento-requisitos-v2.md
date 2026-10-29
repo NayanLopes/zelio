@@ -90,7 +90,7 @@ de renda. Busca um jeito de ser encontrado sem depender de quem se lembra dele.
 | RF05 | Chat entre família e cuidador antes da contratação | Alta | Previsto — exige recurso de tempo real |
 | RF06 | Agendamento de plantões nas modalidades horista, diária e mensal | Alta | Implementado na API |
 | RF07 | Avaliação e comentário mútuo após a conclusão do plantão | Média | Implementado na API |
-| RF10 | Aviso à família em caso de cancelamento ou atraso do cuidador | Média | Previsto |
+| RF10 | Aviso à família em caso de cancelamento ou atraso do cuidador | Média | Implementado na API |
 | RF11 | Aprovação ou reprovação de cadastros de cuidadores pelo administrador | Alta | Implementado na API |
 
 A coluna de situação se refere à API REST em `api/`. "Implementado" significa que

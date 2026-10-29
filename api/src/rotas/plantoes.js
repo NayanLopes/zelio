@@ -2,6 +2,7 @@
 const { Router } = require('express');
 const s = require('../servicos/plantoes');
 const avaliacoes = require('../servicos/avaliacoes');
+const avisos = require('../servicos/avisos');
 const { validar, regra, idNumerico } = require('../middlewares/validacao');
 
 const rotas = Router();
@@ -53,6 +54,20 @@ rotas.post('/:id/avaliacoes', (req, res) => {
     comentario: [regra.texto(500)],
   });
   res.status(201).json(avaliacoes.criar(idNumerico(req.params.id), dados));
+});
+
+rotas.get('/:id/avisos', (req, res) => res.json(avisos.listarDoPlantao(idNumerico(req.params.id))));
+
+// RF10 — o cuidador avisa a familia de atraso ou cancelamento.
+// Cancelamento tambem encerra o plantao, pela tabela de transicoes da RN02.
+rotas.post('/:id/avisos', (req, res) => {
+  const dados = validar(req.body, {
+    tipo:           [regra.obrigatorio, regra.umDe(['atraso', 'cancelamento'])],
+    minutos_atraso: [regra.inteiro(1, 720)],
+    mensagem:       [regra.texto(280)],
+  });
+  const criado = avisos.criar(idNumerico(req.params.id), dados);
+  res.status(201).location(`/plantoes/${req.params.id}/avisos`).json(criado);
 });
 
 module.exports = rotas;

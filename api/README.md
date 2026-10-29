@@ -41,6 +41,7 @@ familias ──< idosos ──< plantoes >── cuidadores ──< documentos
 | `idosos` | Beneficiário do cuidado. Pertence a uma família. |
 | `plantoes` | O serviço contratado. Liga um cuidador a um idoso. |
 | `avaliacoes` | Nota e comentário após a conclusão. Uma por lado. |
+| `avisos` | Atraso ou cancelamento comunicado pelo cuidador durante um plantão aceito. |
 
 ## Endpoints
 
@@ -71,6 +72,8 @@ familias ──< idosos ──< plantoes >── cuidadores ──< documentos
 | DELETE | `/plantoes/:id` | Remove. 409 se já concluído |
 | GET | `/plantoes/:id/avaliacoes` | Avaliações do plantão |
 | POST | `/plantoes/:id/avaliacoes` | Avalia. 409 se não concluído |
+| GET | `/plantoes/:id/avisos` | Avisos do plantão, mais recente primeiro |
+| POST | `/plantoes/:id/avisos` | Avisa atraso ou cancelamento. 409 se o plantão não estiver `aceito` |
 
 O arquivo `requests.http` tem exemplos prontos de cada caso, inclusive os que devem falhar.
 
@@ -95,6 +98,16 @@ recusado, concluido, cancelado → (encerrado)
 **RN03 — avaliação só depois da conclusão.** Avaliar plantão que não está
 `concluido` responde 409. Cada lado avalia uma vez, garantido também por
 `UNIQUE (plantao_id, autor)` no banco.
+
+**RN05 — aviso só em plantão aceito.** Antes do aceite não existe compromisso a
+quebrar, e depois de encerrado não há mais o que avisar. Avisar fora do estado
+`aceito` responde 409.
+
+O aviso de cancelamento não é só recado: ele encerra o plantão, e faz isso
+chamando a mesma máquina de estados da RN02, em vez de escrever direto na tabela.
+A resposta devolve o aviso e o plantão já no novo estado. Avisos de um plantão vêm
+junto dele em `GET /plantoes`, para que a lista da família mostre o destaque sem
+uma segunda requisição por item.
 
 **O preço é do servidor.** `valor_total` é calculado a partir da tabela do cuidador
 e do período. Se o cliente mandar `valor_total`, o campo é ignorado.

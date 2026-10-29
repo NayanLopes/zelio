@@ -111,7 +111,7 @@ direção a elas, e não o contrário.
 
 | Sprint | Review | Peso | Incremento planejado |
 |---|---|---|---|
-| 3 | 29/10 | 15% | V2 de requisitos, arquitetura e roteiro; protótipo navegável de 8 telas; API REST com 25 endpoints e 13 testes |
+| 3 | 29/10 | 15% | V2 de requisitos, arquitetura e roteiro; RF10 implementado na API, com a regra RN05 e 4 testes novos |
 | 4 | 12/11 | 15% | Autenticação e sessão na API; duas entrevistas de validação realizadas e registradas |
 | 5 | 26/11 | 20% | Aplicativo em React Native consumindo a API: busca, perfil e solicitação de plantão |
 | 6 | 03/12 | 25% | Fluxo completo até a avaliação; consolidação das entrevistas; ajuste dos requisitos conforme a evidência coletada |

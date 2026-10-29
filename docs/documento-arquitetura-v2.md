@@ -161,9 +161,9 @@ proibitivo.
 | **Identidade** | Cadastro, autenticação, sessão, perfis | RF01, RF03 |
 | **Verificação** | Envio de documentos, fila de moderação, decisão do administrador | RF02, RF11, RN01 |
 | **Catálogo** | Perfis públicos de cuidadores, busca e filtros | RF04 |
-| **Contratação** | Plantões: solicitação, aceite, recusa, conclusão, cancelamento | RF06, RF10, RN02 |
+| **Contratação** | Plantões: solicitação, aceite, recusa, conclusão, cancelamento, aviso de atraso | RF06, RF10, RN02, RN05 |
 | **Reputação** | Avaliações mútuas e nota agregada | RF07, RN03, RN04 |
-| **Comunicação** | Chat, notificações push, e-mail transacional | RF05, RF10 |
+| **Comunicação** | Chat, notificações push, e-mail transacional | RF05, e a entrega das notificações do RF10 |
 
 Na v1 havia um sétimo módulo, Acompanhamento, que guardava os dados de saúde e
 concentrava o diferencial do produto. Ele saiu inteiro.
@@ -184,7 +184,7 @@ está.
 
 | Área | Estado |
 |---|---|
-| Módulos Verificação, Catálogo, Contratação e Reputação | Implementados como camada de serviços da API REST, com teste automatizado das regras RN01, RN02 e RN03 |
+| Módulos Verificação, Catálogo, Contratação e Reputação | Implementados como camada de serviços da API REST, com teste automatizado das regras RN01, RN02, RN03 e RN05 |
 | Máquina de estados do plantão (seção 6) | Implementada |
 | Módulo Identidade | Não implementado. A API atual não distingue quem chama |
 | Módulo Comunicação (chat, RF05) | Não implementado. Exige recurso de tempo real |
@@ -317,6 +317,12 @@ em vez de uma mensagem genérica de erro. A segunda: a resposta de cada plantão
 inclui o campo `proximos_status`, então a tela decide quais botões mostrar lendo
 a resposta, em vez de reimplementar a regra no cliente. A regra existe em um
 lugar só.
+
+O **aviso de atraso ou cancelamento** (RF10, RN05) entra por esse mesmo módulo, e
+não por um módulo de notificação próprio, porque o que ele comunica é um fato do
+plantão. O cancelamento avisado não escreve direto na tabela: ele chama a máquina
+de estados, como qualquer outra transição. Assim existe um caminho só para mudar
+o estado de um plantão, e não dois que precisem ser mantidos em acordo.
 
 A **guarda de elegibilidade** materializa a RN01 do lado da contratação:
 solicitar plantão a cuidador não aprovado é recusado, mesmo que o identificador
@@ -594,7 +600,7 @@ negócio e a verificação de fronteiras do R03 a cada push.
 | Segurança | CQ03 | Bucket privado e URL assinada de curta duração (ADR-04); criptografia em repouso; menor privilégio | Tentativa de acesso direto ao objeto sem assinatura |
 | Eficiência de recursos | CQ06 | Listas virtualizadas; imagens redimensionadas no servidor; sem bibliotecas pesadas de UI | Medição em aparelho físico de 2 GB |
 | Conformidade | CQ07 | Consentimento registrado por finalidade; segregação por classe de dado; rotina de eliminação | Executar solicitação de exclusão em homologação e auditar resíduos |
-| Correção de domínio | CQ08 | Tabela única de transições no serviço; resposta devolve `proximos_status`; restrição de unicidade no banco para a RN03 | Teste automatizado por transição inválida; hoje são 13 testes cobrindo as três regras |
+| Correção de domínio | CQ08 | Tabela única de transições no serviço; resposta devolve `proximos_status`; restrição de unicidade no banco para a RN03; restrição CHECK na tabela de avisos para a forma do aviso | Teste automatizado por transição inválida; hoje são 17 testes cobrindo as quatro regras |
 
 ---
 
@@ -606,7 +612,7 @@ negócio e a verificação de fronteiras do R03 a cada push.
 | RF02, RF11 | Verificação | API + Object Storage + Painel Admin | Registro e aprovação sim; binário não |
 | RF04 | Catálogo | API + banco | Sim |
 | RF05 | Comunicação | API (WebSocket) | Não |
-| RF06, RF10 | Contratação | API + banco | RF06 sim; RF10 não |
+| RF06, RF10 | Contratação | API + banco | Sim |
 | RF07 | Reputação | API + banco | Sim |
 
 ---
