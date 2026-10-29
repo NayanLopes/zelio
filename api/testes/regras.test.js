@@ -1,8 +1,4 @@
 'use strict';
-/**
- * Testes das regras de negocio, direto nos servicos — sem HTTP.
- * Rode com:  node --test testes/
- */
 const { test, before } = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
@@ -135,10 +131,6 @@ test('nao se remove cuidador com plantao em aberto', () => {
   assert.throws(() => cuidadores.remover(aprovado.id), (e) => e.status === 409);
   plantoes.remover(p.id);
 });
-
-// ---------------------------------------------------------------- RF10
-// Avisos de atraso e cancelamento. A regra nova e a RN05: so plantao
-// aceito aceita aviso.
 
 test('RN05: so plantao aceito aceita aviso', () => {
   const p = plantoes.criar(plantaoBase({ data_inicio: '2027-07-01', data_fim: '2027-07-03' }));

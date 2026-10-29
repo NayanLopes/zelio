@@ -3,12 +3,7 @@ const AppError = require('../erros/AppError');
 const repo = require('../repositorios/avisos');
 const plantoes = require('./plantoes');
 
-/**
- * RF10 — aviso de atraso ou cancelamento, enviado pelo cuidador a familia.
- *
- * RN05: so plantao em 'aceito' aceita aviso. Antes do aceite nao existe
- * compromisso a quebrar, e depois de encerrado nao ha mais o que avisar.
- */
+// RF10, RN05
 const ESTADO_QUE_ACEITA_AVISO = 'aceito';
 
 function criar(plantaoId, dados) {
@@ -20,8 +15,6 @@ function criar(plantaoId, dados) {
     );
   }
 
-  // A forma do aviso depende do tipo. A validacao de rota nao tem como
-  // saber disso sozinha, entao a regra fica aqui, junto das outras.
   if (dados.tipo === 'atraso' && dados.minutos_atraso == null) {
     throw AppError.invalido('Dados invalidos', { minutos_atraso: 'e obrigatorio em aviso de atraso' });
   }
@@ -31,8 +24,6 @@ function criar(plantaoId, dados) {
 
   const aviso = repo.inserir(plantaoId, dados);
 
-  // Cancelamento nao e so recado: encerra o plantao. A mudanca passa pela
-  // mesma tabela de transicoes da RN02, e nao por um UPDATE paralelo.
   const plantao = dados.tipo === 'cancelamento'
     ? plantoes.mudarStatus(plantaoId, 'cancelado')
     : plantoes.buscarPorId(plantaoId);

@@ -1,9 +1,5 @@
 'use strict';
 
-/**
- * Erro com codigo HTTP. Servicos lancam AppError; o tratador central
- * em middlewares/erros.js e o unico lugar que monta a resposta.
- */
 class AppError extends Error {
   constructor(status, mensagem, detalhes) {
     super(mensagem);
