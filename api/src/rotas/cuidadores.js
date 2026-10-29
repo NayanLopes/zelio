@@ -51,7 +51,6 @@ rotas.patch('/:id', (req, res) => {
   res.json(s.atualizar(idNumerico(req.params.id), dados));
 });
 
-// RF11 — decisao do administrador
 rotas.patch('/:id/verificacao', (req, res) => {
   const { status_verificacao } = validar(req.body, {
     status_verificacao: [regra.obrigatorio, regra.umDe(['pendente', 'aprovado', 'reprovado'])],

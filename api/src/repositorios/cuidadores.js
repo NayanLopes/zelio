@@ -7,10 +7,6 @@ const COLUNAS = `c.id, c.nome, c.email, c.telefone, c.cidade, c.bairro,
 const buscarPorId = (id) =>
   db.prepare(`SELECT ${COLUNAS} FROM cuidadores c WHERE c.id = ?`).get(id);
 
-/**
- * Filtros opcionais: cidade, bairro, especialidade, valor_diaria_max.
- * `somenteAprovados` e decidido pelo servico, nao por este modulo.
- */
 function listar(filtros = {}, somenteAprovados = true) {
   const cond = [];
   const params = [];
@@ -53,8 +49,6 @@ const contarPlantoesEmAberto = (id) => db.prepare(
   `SELECT COUNT(*) AS n FROM plantoes WHERE cuidador_id = ? AND status IN ('solicitado','aceito')`
 ).get(id).n;
 
-// ----------------------------------------------------------- especialidades
-
 const especialidadesDe = (cuidadorId) => db.prepare(`
   SELECT e.id, e.nome FROM especialidades e
   JOIN cuidador_especialidades ce ON ce.especialidade_id = e.id
@@ -66,8 +60,6 @@ function substituirEspecialidades(cuidadorId, ids) {
   const ins = db.prepare('INSERT INTO cuidador_especialidades (cuidador_id, especialidade_id) VALUES (?, ?)');
   for (const eid of ids) ins.run(cuidadorId, eid);
 }
-
-// ----------------------------------------------------------- documentos
 
 function inserirDocumento(cuidadorId, tipo) {
   const info = db.prepare('INSERT INTO documentos (cuidador_id, tipo) VALUES (?, ?)')
@@ -81,8 +73,6 @@ const listarDocumentos = (cuidadorId) =>
 const definirStatusDosDocumentos = (cuidadorId, status) => db.prepare(
   `UPDATE documentos SET status = ?, conferido_em = datetime('now') WHERE cuidador_id = ?`
 ).run(status, cuidadorId);
-
-// ----------------------------------------------------------- reputacao
 
 const reputacaoDe = (cuidadorId) => db.prepare(`
   SELECT COUNT(*) AS total, AVG(a.nota) AS media

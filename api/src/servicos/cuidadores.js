@@ -14,13 +14,9 @@ function montar(linha) {
   };
 }
 
-/**
- * RN01 — a busca publica devolve apenas cuidadores aprovados.
- * Passar incluir_nao_aprovados=true e uso administrativo.
- */
+// RN01
 function listar(filtros = {}) {
   let lista = repo.listar(filtros, !filtros.incluir_nao_aprovados).map(montar);
-  // a nota media e calculada, e nao coluna: o filtro nao cabe no SQL da listagem
   if (filtros.nota_minima !== undefined) {
     lista = lista.filter((c) => c.nota_media !== null && c.nota_media >= filtros.nota_minima);
   }
@@ -59,11 +55,10 @@ function atualizar(id, dados) {
   return buscarPorId(id);
 }
 
-/** RF11 — decisao do administrador sobre o cadastro. */
+// RF11
 function definirVerificacao(id, status) {
   buscarPorId(id);
   repo.definirStatusVerificacao(id, status);
-  // a decisao sobre o cadastro vale para os documentos que a sustentaram
   if (status !== 'pendente') {
     repo.definirStatusDosDocumentos(id, status === 'aprovado' ? 'aprovado' : 'reprovado');
   }

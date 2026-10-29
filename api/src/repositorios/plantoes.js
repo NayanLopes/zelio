@@ -3,7 +3,6 @@ const { db } = require('../db');
 
 const buscarPorId = (id) => db.prepare('SELECT * FROM plantoes WHERE id = ?').get(id);
 
-/** Filtros opcionais: cuidador_id, idoso_id, familia_id, status. */
 function listar(filtros = {}) {
   const cond = [];
   const params = [];
@@ -33,14 +32,12 @@ const atualizarStatus = (id, status) =>
 
 const remover = (id) => db.prepare('DELETE FROM plantoes WHERE id = ?').run(id);
 
-/** Quantos plantoes em aberto do mesmo cuidador cruzam com o periodo informado. */
 const contarSobreposicoes = (cuidadorId, inicio, fim) => db.prepare(`
   SELECT COUNT(*) AS n FROM plantoes
   WHERE cuidador_id = ? AND status IN ('solicitado','aceito')
     AND NOT (data_fim < ? OR data_inicio > ?)
 `).get(cuidadorId, inicio, fim).n;
 
-/** Dados minimos do cuidador e do idoso, para compor a resposta de um plantao. */
 const cuidadorResumido = (id) =>
   db.prepare('SELECT id, nome, cidade, bairro FROM cuidadores WHERE id = ?').get(id);
 
