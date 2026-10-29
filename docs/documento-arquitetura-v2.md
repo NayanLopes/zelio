@@ -108,6 +108,7 @@ Dos nove requisitos funcionais da v2, três alteram a estrutura do sistema:
 |---|---|
 | **RF02**: envio de documentos comprobatórios | Introduz dado sensível e armazenamento de binários; exige segregação e controle de acesso próprios |
 | **RF04**: busca com filtros | Define o modelo de leitura e a estratégia de indexação |
+| **RF13**: identificação verificada da família | Torna a verificação bidirecional. O módulo Verificação deixa de ser um pedágio de entrada do cuidador e passa a ser condição de participação dos dois lados, o que muda o modelo de dados e a fila de moderação |
 | **RF06**: agendamento de plantões | Carrega a máquina de estados do plantão e a RN02. É o único ponto do sistema com transição de estado não trivial, e decide onde a regra mora |
 
 Os demais (RF01, RF03, RF05, RF07, RF10, RF11) são cadastro, mensageria e
@@ -159,7 +160,7 @@ proibitivo.
 | Módulo | Responsabilidade | RFs |
 |---|---|---|
 | **Identidade** | Cadastro, autenticação, sessão, perfis | RF01, RF03 |
-| **Verificação** | Envio de documentos, fila de moderação, decisão do administrador | RF02, RF11, RN01 |
+| **Verificação** | Envio de documentos, fila de moderação, decisão do administrador, dos dois lados | RF02, RF11, RF13, RN01, RN06 |
 | **Catálogo** | Perfis públicos de cuidadores, busca e filtros | RF04 |
 | **Contratação** | Plantões: solicitação, aceite, recusa, conclusão, cancelamento, aviso de atraso | RF06, RF10, RN02, RN05 |
 | **Reputação** | Avaliações mútuas e nota agregada | RF07, RN03, RN04 |
@@ -634,6 +635,9 @@ negócio e a verificação de fronteiras do R03 a cada push.
 | RF05 | Comunicação | API (WebSocket) | Não |
 | RF06, RF10 | Contratação | API + banco | Sim |
 | RF07 | Reputação | API + banco | Sim |
+| RF13 | Verificação | API + Object Storage + Painel Admin | Não |
+| RF14 | Catálogo + Contratação | API + banco | Não |
+| RF15 | Contratação | API + banco | Não |
 
 ---
 
@@ -647,6 +651,7 @@ negócio e a verificação de fronteiras do R03 a cada push.
 | R06 | Base de cuidadores vazia no lançamento, o problema do ovo e da galinha | Alto para o produto, não para a arquitetura | Fora do escopo técnico: tratar na estratégia de validação regional |
 | R07 | Nome **Zelio** é foneticamente próximo do concorrente **Zelo** | Médio: confusão de marca e risco de conflito de registro | Consultar busca no INPI antes de investir em identidade visual |
 | R08 | Migração de SQLite para PostgreSQL (ADR-09) revelar dependências do dialeto | Médio | Manter as regras fora da camada de dados; evitar recurso específico de SQLite no esquema |
+| R10 | A verificação de um lado só dar ao cuidador uma falsa sensação de segurança | **Alto**: a plataforma empresta credibilidade à família sem ter conferido nada sobre ela, substituindo uma desconfiança útil por confiança sem lastro | RF13 e RF14; enquanto não existirem, não afirmar na interface nada que sugira que a família foi conferida |
 | R09 | O projeto não ter validação com stakeholder registrada até o fim do semestre | **Alto**: todas as decisões de produto seguem apoiadas em suposição, e a disciplina cobra o registro em toda sprint review | Agendar e registrar as conversas; o registro é entregável de sprint, não etapa opcional |
 
 Os riscos R01 e R02 da v1 saíram: o primeiro dependia da hipótese H5, sobre
@@ -658,11 +663,15 @@ de escopo eliminou o primeiro e fechou o segundo.
 ## 14. Pendências para a v3
 
 1. Autenticação e sessão. A API hoje não distingue quem chama, e sem isso
-   nenhuma regra de autorização da seção 7.2 é aplicável de fato.
-2. Receber o binário dos documentos e implementar o ADR-04.
-3. Revisar ADR-08 à luz das entrevistas.
-4. Especificar o contrato da API em OpenAPI.
-5. Definir o modelo de negócio e seu impacto arquitetural. Se houver pagamento
+   nenhuma regra de autorização da seção 7.2 é aplicável de fato. É também
+   pré-requisito do RF13: não se verifica a identidade de quem o sistema não
+   sabe quem é.
+2. Verificação do lado da família (RF13, RF14, RF15) e o efeito dela sobre o
+   modelo de dados, a fila de moderação e o que a busca mostra antes do aceite.
+3. Receber o binário dos documentos e implementar o ADR-04.
+4. Revisar ADR-08 à luz das entrevistas.
+5. Especificar o contrato da API em OpenAPI.
+6. Definir o modelo de negócio e seu impacto arquitetural. Se houver pagamento
    intermediado, entram requisito de PCI e um módulo Financeiro.
 
 ---

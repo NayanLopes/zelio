@@ -47,7 +47,25 @@ A consequência arquitetural foi grande: saiu um módulo inteiro, duas decisões
 de arquitetura, dois cenários de qualidade e dois riscos. O registro está na
 seção 15 do documento de arquitetura v2.
 
-### 2.3 Efeito da redução sobre o prazo
+### 2.3 Entrada de escopo: segurança do cuidador
+
+Nem toda mudança de escopo é corte. Na sprint 3 entraram três requisitos novos,
+RF13, RF14 e RF15, depois de uma observação do professor da disciplina de
+Programação para Dispositivos Móveis.
+
+O projeto vinha tratando segurança como problema da família: verificar o
+cuidador, conferir documentos, exibir reputação. A observação foi simples e
+difícil de contestar — o cuidador também corre risco, e maior em alguns
+sentidos, porque é ele quem entra sozinho na casa de um desconhecido.
+
+A entrada é deliberada e tem custo. Ela aumenta o trabalho da sprint 5 e torna a
+autenticação, já planejada para a sprint 4, pré-requisito de mais coisas. A
+alternativa seria registrar a lacuna e seguir, e isso foi descartado por um
+motivo específico: uma plataforma que verifica um lado só empresta credibilidade
+ao lado não verificado. Isso é o risco R10 da arquitetura, e não é um risco que
+se possa deixar para depois sem mudar o que a interface promete enquanto isso.
+
+### 2.4 Efeito da redução sobre o prazo
 
 A redução diminuiu o trabalho de implementação e aumentou, no curto prazo, o
 trabalho de documentação: todo documento escrito sob o escopo antigo precisou
@@ -111,9 +129,9 @@ direção a elas, e não o contrário.
 
 | Sprint | Review | Peso | Incremento planejado |
 |---|---|---|---|
-| 3 | 29/10 | 15% | V2 de requisitos, arquitetura e roteiro; RF10 implementado na API, com a regra RN05 e 4 testes novos |
-| 4 | 12/11 | 15% | Autenticação e sessão na API; duas entrevistas de validação realizadas e registradas |
-| 5 | 26/11 | 20% | Aplicativo em React Native consumindo a API: busca, perfil e solicitação de plantão |
+| 3 | 29/10 | 15% | V2 de requisitos, arquitetura e roteiro; RF10 implementado na API com a regra RN05; separação em três camadas (ADR-10); segurança do cuidador incorporada ao escopo (RF13-RF15) |
+| 4 | 12/11 | 15% | Autenticação e sessão na API; duas entrevistas de validação realizadas e registradas, com H10 na pauta |
+| 5 | 26/11 | 20% | Verificação do lado da família (RF13) e o que o cuidador vê antes de aceitar (RF14); aplicativo em React Native consumindo a API: busca, perfil e solicitação de plantão |
 | 6 | 03/12 | 25% | Fluxo completo até a avaliação; consolidação das entrevistas; ajuste dos requisitos conforme a evidência coletada |
 
 ### 4.2 Regra de ritmo adotada
