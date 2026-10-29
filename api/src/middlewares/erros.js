@@ -5,15 +5,12 @@ function rotaNaoEncontrada(req, res) {
   res.status(404).json({ erro: `Rota nao encontrada: ${req.method} ${req.originalUrl}` });
 }
 
-// Assinatura de 4 argumentos: e assim que o Express reconhece
-// um middleware como tratador de erro.
 function tratadorDeErros(err, req, res, _next) {
   if (err instanceof AppError) {
     const corpo = { erro: err.message };
     if (err.detalhes) corpo.detalhes = err.detalhes;
     return res.status(err.status).json(corpo);
   }
-  // JSON malformado vem do express.json() com esta marca
   if (err && err.type === 'entity.parse.failed') {
     return res.status(400).json({ erro: 'JSON malformado no corpo da requisicao' });
   }

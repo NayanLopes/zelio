@@ -1,11 +1,6 @@
 'use strict';
 const AppError = require('../erros/AppError');
 
-/**
- * Validacao declarativa. Cada campo recebe uma lista de regras;
- * o corpo inteiro e conferido de uma vez para que a resposta 400
- * liste todos os problemas, e nao apenas o primeiro.
- */
 const regra = {
   obrigatorio: (v) => (v === undefined || v === null || v === '' ? 'e obrigatorio' : null),
   texto: (max) => (v) =>

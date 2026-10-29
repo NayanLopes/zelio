@@ -10,8 +10,6 @@ DROP TABLE IF EXISTS cuidador_especialidades;
 DROP TABLE IF EXISTS cuidadores;
 DROP TABLE IF EXISTS especialidades;
 
--- Especialidade clinica. O filtro por especialidade e o diferencial do Zelio
--- frente a aplicativos genericos de servicos domesticos.
 CREATE TABLE especialidades (
   id   INTEGER PRIMARY KEY AUTOINCREMENT,
   nome TEXT    NOT NULL UNIQUE
@@ -27,7 +25,6 @@ CREATE TABLE cuidadores (
   anos_experiencia   INTEGER NOT NULL DEFAULT 0,
   valor_diaria       REAL    NOT NULL,
   valor_hora         REAL    NOT NULL,
-  -- RN01: so aparece na busca depois de aprovado pelo administrador
   status_verificacao TEXT    NOT NULL DEFAULT 'pendente'
                      CHECK (status_verificacao IN ('pendente','aprovado','reprovado')),
   criado_em          TEXT    NOT NULL DEFAULT (datetime('now'))
@@ -59,9 +56,6 @@ CREATE TABLE familias (
   criado_em   TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
--- O idoso e beneficiario do cuidado, nao usuario do aplicativo.
--- "condicao" e uma descricao curta escrita pela propria familia,
--- nao um prontuario: o escopo do projeto nao inclui dado clinico.
 CREATE TABLE idosos (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   familia_id INTEGER NOT NULL REFERENCES familias(id) ON DELETE CASCADE,
@@ -80,14 +74,11 @@ CREATE TABLE plantoes (
   hora_inicio TEXT    NOT NULL,
   hora_fim    TEXT    NOT NULL,
   valor_total REAL    NOT NULL CHECK (valor_total >= 0),
-  -- RN02: nasce sempre como 'solicitado'. So o cuidador move para 'aceito'.
   status      TEXT    NOT NULL DEFAULT 'solicitado'
               CHECK (status IN ('solicitado','aceito','recusado','concluido','cancelado')),
   criado_em   TEXT    NOT NULL DEFAULT (datetime('now'))
 );
 
--- RN03: so existe avaliacao de plantao concluido (garantido no servico).
--- Cada lado avalia uma vez so.
 CREATE TABLE avaliacoes (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
   plantao_id INTEGER NOT NULL REFERENCES plantoes(id) ON DELETE CASCADE,
@@ -98,14 +89,10 @@ CREATE TABLE avaliacoes (
   UNIQUE (plantao_id, autor)
 );
 
--- RF10: o cuidador avisa a familia de atraso ou cancelamento.
--- RN05: so plantao aceito aceita aviso. Antes do aceite nao ha compromisso
--- a quebrar; depois de encerrado nao ha mais o que avisar.
 CREATE TABLE avisos (
   id             INTEGER PRIMARY KEY AUTOINCREMENT,
   plantao_id     INTEGER NOT NULL REFERENCES plantoes(id) ON DELETE CASCADE,
   tipo           TEXT    NOT NULL CHECK (tipo IN ('atraso','cancelamento')),
-  -- so faz sentido em aviso de atraso; o servico recusa nos demais
   minutos_atraso INTEGER CHECK (minutos_atraso IS NULL OR minutos_atraso BETWEEN 1 AND 720),
   mensagem       TEXT,
   criado_em      TEXT    NOT NULL DEFAULT (datetime('now')),

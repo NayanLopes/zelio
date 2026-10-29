@@ -31,7 +31,6 @@ rotas.post('/', (req, res) => {
   res.status(201).location(`/plantoes/${criado.id}`).json(criado);
 });
 
-// RN02 — a mudanca de estado e o unico caminho para confirmar um plantao
 rotas.patch('/:id/status', (req, res) => {
   const { status } = validar(req.body, {
     status: [regra.obrigatorio, regra.umDe(['aceito', 'recusado', 'concluido', 'cancelado'])],
@@ -46,7 +45,6 @@ rotas.delete('/:id', (req, res) => {
 
 rotas.get('/:id/avaliacoes', (req, res) => res.json(avaliacoes.listarDoPlantao(idNumerico(req.params.id))));
 
-// RN03 — so avalia plantao concluido
 rotas.post('/:id/avaliacoes', (req, res) => {
   const dados = validar(req.body, {
     autor:      [regra.obrigatorio, regra.umDe(['familia', 'cuidador'])],
@@ -58,8 +56,6 @@ rotas.post('/:id/avaliacoes', (req, res) => {
 
 rotas.get('/:id/avisos', (req, res) => res.json(avisos.listarDoPlantao(idNumerico(req.params.id))));
 
-// RF10 — o cuidador avisa a familia de atraso ou cancelamento.
-// Cancelamento tambem encerra o plantao, pela tabela de transicoes da RN02.
 rotas.post('/:id/avisos', (req, res) => {
   const dados = validar(req.body, {
     tipo:           [regra.obrigatorio, regra.umDe(['atraso', 'cancelamento'])],

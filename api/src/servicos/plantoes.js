@@ -6,12 +6,7 @@ const avisosRepo = require('../repositorios/avisos');
 const cuidadores = require('./cuidadores');
 const familias = require('./familias');
 
-/**
- * Transicoes permitidas do plantao. Fora desta tabela, nada passa.
- *
- * RN02 — o plantao nasce 'solicitado' e so o aceite do cuidador o
- * confirma. Nao existe caminho que pule direto para 'aceito'.
- */
+// RN02
 const TRANSICOES = {
   solicitado: ['aceito', 'recusado', 'cancelado'],
   aceito:     ['concluido', 'cancelado'],
@@ -27,8 +22,6 @@ function montar(linha) {
     idoso: repo.idosoResumido(linha.idoso_id),
     cuidador: repo.cuidadorResumido(linha.cuidador_id),
     avaliacoes: avaliacoesRepo.resumoDoPlantao(linha.id),
-    // RF10 — a lista da familia mostra o aviso em destaque, entao ele vem
-    // junto do plantao e nao exige uma segunda requisicao por item.
     avisos: avisosRepo.resumoDoPlantao(linha.id),
     proximos_status: TRANSICOES[linha.status],
   };
@@ -55,20 +48,19 @@ function horasEntre(inicio, fim) {
   return (hf * 60 + mf - hi * 60 - mi) / 60;
 }
 
-/** Valor total calculado no servidor. O cliente nao dita preco. */
 function calcularValor(cuidador, dados) {
   const dias = diasEntre(dados.data_inicio, dados.data_fim);
   const horas = horasEntre(dados.hora_inicio, dados.hora_fim);
   if (dados.modalidade === 'horista') return Math.round(horas * dias * cuidador.valor_hora * 100) / 100;
   if (dados.modalidade === 'diaria')  return Math.round(dias * cuidador.valor_diaria * 100) / 100;
-  return Math.round(dias * cuidador.valor_diaria * 0.9 * 100) / 100; // mensal: 10% de desconto
+  return Math.round(dias * cuidador.valor_diaria * 0.9 * 100) / 100;
 }
 
 function criar(dados) {
   const cuidador = cuidadores.buscarPorId(dados.cuidador_id);
   familias.buscarIdoso(dados.idoso_id);
 
-  // RN01 — nao se contrata quem ainda nao foi aprovado
+  // RN01
   if (cuidador.status_verificacao !== 'aprovado') {
     throw AppError.conflito('Este cuidador ainda nao foi aprovado pelo administrador');
   }

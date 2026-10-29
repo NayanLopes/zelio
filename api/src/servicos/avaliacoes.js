@@ -3,7 +3,7 @@ const AppError = require('../erros/AppError');
 const repo = require('../repositorios/avaliacoes');
 const plantoes = require('./plantoes');
 
-/** RN03 — so se avalia plantao concluido, e cada lado avalia uma vez. */
+// RN03
 function criar(plantaoId, dados) {
   const p = plantoes.buscarPorId(plantaoId);
   if (p.status !== 'concluido') {
