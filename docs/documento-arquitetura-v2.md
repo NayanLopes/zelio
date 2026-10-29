@@ -15,7 +15,7 @@
 | Versão | Data | O que mudou |
 |---|---|---|
 | v1 | 27/08/2026 | Primeira versão, derivada do documento de requisitos v1 |
-| v2 | 28/10/2026 | Redução de escopo para marketplace. Saiu o módulo Acompanhamento e tudo que dependia dele: ADR-05, ADR-06, CQ04, CQ05 e os riscos R01 e R02. Entrou o ADR-09, que registra a distância entre a arquitetura alvo e a implementação atual |
+| v2 | 28/10/2026 | Redução de escopo para marketplace. Saiu o módulo Acompanhamento e tudo que dependia dele: ADR-05, ADR-06, CQ04, CQ05 e os riscos R01 e R02. Entraram o ADR-09, que registra a distância entre a arquitetura alvo e a implementação atual, e o ADR-10, que separa regra de negócio de acesso a dados |
 
 A v1 descrevia um produto que acompanhava a execução do cuidado. A v2 descreve um
 produto que intermedia a contratação e para por ali. Não é um corte de
@@ -186,6 +186,7 @@ está.
 |---|---|
 | Módulos Verificação, Catálogo, Contratação e Reputação | Implementados como camada de serviços da API REST, com teste automatizado das regras RN01, RN02, RN03 e RN05 |
 | Máquina de estados do plantão (seção 6) | Implementada |
+| Separação em três camadas: rotas, serviços e repositórios (ADR-10) | Implementada. Nenhuma linha de SQL fora de `repositorios/` |
 | Módulo Identidade | Não implementado. A API atual não distingue quem chama |
 | Módulo Comunicação (chat, RF05) | Não implementado. Exige recurso de tempo real |
 | Documentos em bucket privado (ADR-04) | Não implementado. Hoje existe apenas o registro do documento, sem o binário |
@@ -559,8 +560,27 @@ dali. É o que permite à interface não duplicar a regra.
 
 **Contexto.** A arquitetura alvo prevê PostgreSQL gerenciado e um framework de aplicação estruturado. A primeira implementação da API precisava rodar na máquina de quem fosse avaliar, sem instalar servidor de banco, e precisava ficar pronta dentro de uma etapa da disciplina de Programação para Dispositivos Móveis, que exige Node.js com Express.
 **Decisão.** Decidi implementar a API com Express e SQLite em arquivo, mantendo as regras de negócio em uma camada de serviços separada das rotas.
-**Justificativa.** A separação entre rotas e serviços é o que torna a escolha reversível. As regras não conhecem o banco nem o framework HTTP: trocar SQLite por PostgreSQL mexe na camada de acesso a dados, não nas regras, e os testes das regras continuam valendo. O esquema usa chaves estrangeiras e restrições CHECK, que existem nos dois bancos.
+**Justificativa.** A reversibilidade depende de existir uma camada de acesso a dados separada, e o ADR-10 a criou: as regras não conhecem o banco nem o framework HTTP, então trocar SQLite por PostgreSQL mexe em `repositorios/` e os testes das regras continuam valendo. O esquema usa chaves estrangeiras e restrições CHECK, que existem nos dois bancos.
+
+> **Correção de registro.** Quando este ADR foi escrito, a justificativa acima
+> já estava redigida assim, mas não correspondia ao código: os serviços
+> continham SQL. A separação existia entre rotas e serviços, e não entre regra e
+> banco. O ADR-10 fechou essa distância. Fica registrado porque um documento de
+> arquitetura que descreve o sistema que se gostaria de ter, e não o que existe,
+> perde a função.
 **Consequências.** SQLite não suporta escrita concorrente de verdade, o que é irrelevante no volume atual e inaceitável em produção. A migração é dívida técnica assumida e está no risco R08. Em compensação, a API sobe com `npm install && npm start`, sem nenhuma dependência externa — o que também a torna demonstrável em sala, sem depender da rede.
+
+### ADR-10: Camada de repositórios separando regra de negócio e SQL
+
+**Contexto.** A API tinha duas camadas: rotas e serviços. Os serviços concentravam as regras de negócio **e** o SQL. Funcionava, mas criava três problemas. O primeiro é que a justificativa do ADR-09 — trocar de banco sem tocar nas regras — não se sustentava, porque as regras estavam misturadas com as consultas. O segundo é que uma mesma consulta aparecia escrita de formas ligeiramente diferentes em serviços distintos. O terceiro é que ler uma regra de negócio exigia atravessar SQL que não tinha nada a ver com ela.
+
+**Decisão.** Decidi introduzir `src/repositorios/`, um módulo por agregado, concentrando todo o SQL do sistema. Serviços passam a depender de repositórios e não do banco. Nenhum `db.prepare` existe fora dessa pasta.
+
+A fronteira tem uma regra que vale a pena explicitar: **o repositório não lança `AppError` e não conhece HTTP**. Quando não encontra, devolve `undefined`. É o serviço que transforma ausência em 404, porque "não encontrado" é uma resposta da aplicação, não do armazenamento. Sem essa regra, a camada de dados começaria a decidir código de status, e a separação viraria enfeite.
+
+**Alternativas.** *Manter duas camadas*: menos arquivos, e defensável num sistema pequeno. Descartada porque o ADR-09 depende desta separação para ser reversível, e porque a disciplina avalia justamente a estrutura. *ORM (Prisma, Sequelize, TypeORM)*: traria o mapeamento pronto, mas esconde o SQL em vez de organizá-lo, acrescenta dependência pesada e tiraria do projeto a parte em que o controle sobre a consulta é visível e avaliável. *Padrão Repository com interface e injeção de dependência*: a formalização completa não se paga num projeto deste tamanho, com um desenvolvedor; o módulo Node já dá o ponto de substituição.
+
+**Consequências.** Mais arquivos e uma indireção a mais para seguir ao ler o código. Em troca: as regras ficam legíveis sem ruído, a consulta de cada agregado tem um lugar só, e a migração do R08 passa a ser uma reescrita de pasta em vez de uma caçada por `db.prepare` espalhado. Os 17 testes passaram sem alteração durante a refatoração, o que é a evidência de que o comportamento não mudou — e também a razão de a refatoração ter sido segura de fazer em uma noite.
 
 ---
 

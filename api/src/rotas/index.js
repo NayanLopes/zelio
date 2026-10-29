@@ -1,6 +1,7 @@
 'use strict';
 const { Router } = require('express');
-const { db, driver } = require('../db');
+const { driver } = require('../db');
+const especialidades = require('../repositorios/especialidades');
 
 const rotas = Router();
 
@@ -14,9 +15,7 @@ rotas.get('/', (req, res) => {
   });
 });
 
-rotas.get('/especialidades', (req, res) => {
-  res.json(db.prepare('SELECT * FROM especialidades ORDER BY nome').all());
-});
+rotas.get('/especialidades', (req, res) => res.json(especialidades.listar()));
 
 rotas.use('/cuidadores', require('./cuidadores'));
 rotas.use('/familias', require('./familias'));

@@ -142,8 +142,9 @@ Erro sempre responde `{ "erro": "..." }`, e `400` acrescenta `detalhes`:
 src/
   server.js              sobe o servidor
   app.js                 monta o Express e a ordem dos middlewares
-  rotas/                 HTTP: lê a requisição, valida, devolve resposta
-  servicos/              regras de negócio e acesso ao banco
+  rotas/                 HTTP: lê a requisição, valida a forma, devolve resposta
+  servicos/              regras de negócio — nenhuma linha de SQL
+  repositorios/          acesso ao banco — todo o SQL do sistema
   middlewares/
     validacao.js         validação declarativa, campo a campo
     erros.js             404 e tratador central de erros
@@ -152,12 +153,39 @@ src/
     driver.js            adaptador entre better-sqlite3 e node:sqlite
     schema.sql           tabelas, chaves estrangeiras e CHECKs
     seed.js              recria o banco com dados de exemplo
-testes/regras.test.js    13 testes das regras de negócio
+testes/regras.test.js    17 testes das regras de negócio
 requests.http            exemplos de requisição
 ```
 
-A separação entre `rotas` e `servicos` é o que permite testar as regras sem subir
-o servidor: os testes chamam os serviços diretamente.
+São três camadas, e cada requisição atravessa as três na mesma ordem:
+
+```
+rotas/  →  servicos/  →  repositorios/  →  banco
+   ↑           ↑              ↑
+ HTTP       regras           SQL
+```
+
+O que cada uma pode e não pode fazer:
+
+| Camada | Conhece | Não conhece |
+|---|---|---|
+| `rotas` | `req`, `res`, códigos de status | regra de negócio, SQL |
+| `servicos` | regras, outros serviços, repositórios | `req`, `res`, SQL |
+| `repositorios` | SQL e o formato das tabelas | regra de negócio, HTTP |
+
+Duas consequências práticas:
+
+**Os testes não sobem o servidor.** Eles chamam os serviços diretamente, com o
+banco em memória. É por isso que a suíte roda em menos de um segundo.
+
+**Trocar de banco mexe em uma pasta só.** O ADR-09 escolheu SQLite para o MVP
+com PostgreSQL como alvo. Essa troca mexe em `repositorios/`, e os testes das
+regras continuam valendo sem alteração — é exatamente o que torna a decisão
+reversível.
+
+Um detalhe da divisão: **repositório não lança `AppError`**. Quando não encontra,
+devolve `undefined`. Transformar ausência em 404 é decisão do serviço, porque
+"não encontrado" é resposta de aplicação e não de armazenamento.
 
 ## Documentos relacionados
 
