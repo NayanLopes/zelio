@@ -1,6 +1,6 @@
 'use strict';
-const { db } = require('../db');
 const AppError = require('../erros/AppError');
+const repo = require('../repositorios/avisos');
 const plantoes = require('./plantoes');
 
 /**
@@ -29,9 +29,7 @@ function criar(plantaoId, dados) {
     throw AppError.invalido('Dados invalidos', { minutos_atraso: 'nao se aplica a aviso de cancelamento' });
   }
 
-  const info = db.prepare(
-    'INSERT INTO avisos (plantao_id, tipo, minutos_atraso, mensagem) VALUES (?, ?, ?, ?)'
-  ).run(plantaoId, dados.tipo, dados.minutos_atraso ?? null, dados.mensagem ?? null);
+  const aviso = repo.inserir(plantaoId, dados);
 
   // Cancelamento nao e so recado: encerra o plantao. A mudanca passa pela
   // mesma tabela de transicoes da RN02, e nao por um UPDATE paralelo.
@@ -39,15 +37,12 @@ function criar(plantaoId, dados) {
     ? plantoes.mudarStatus(plantaoId, 'cancelado')
     : plantoes.buscarPorId(plantaoId);
 
-  return {
-    aviso: db.prepare('SELECT * FROM avisos WHERE id = ?').get(Number(info.lastInsertRowid)),
-    plantao,
-  };
+  return { aviso, plantao };
 }
 
 function listarDoPlantao(plantaoId) {
   plantoes.buscarPorId(plantaoId);
-  return db.prepare('SELECT * FROM avisos WHERE plantao_id = ? ORDER BY criado_em DESC').all(plantaoId);
+  return repo.doPlantao(plantaoId);
 }
 
 module.exports = { criar, listarDoPlantao };

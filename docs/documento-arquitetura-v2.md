@@ -15,7 +15,7 @@
 | Versão | Data | O que mudou |
 |---|---|---|
 | v1 | 27/08/2026 | Primeira versão, derivada do documento de requisitos v1 |
-| v2 | 28/10/2026 | Redução de escopo para marketplace. Saiu o módulo Acompanhamento e tudo que dependia dele: ADR-05, ADR-06, CQ04, CQ05 e os riscos R01 e R02. Entrou o ADR-09, que registra a distância entre a arquitetura alvo e a implementação atual |
+| v2 | 28/10/2026 | Redução de escopo para marketplace. Saiu o módulo Acompanhamento e tudo que dependia dele: ADR-05, ADR-06, CQ04, CQ05 e os riscos R01 e R02. Entraram o ADR-09, que registra a distância entre a arquitetura alvo e a implementação atual, e o ADR-10, que separa regra de negócio de acesso a dados |
 
 A v1 descrevia um produto que acompanhava a execução do cuidado. A v2 descreve um
 produto que intermedia a contratação e para por ali. Não é um corte de
@@ -108,6 +108,7 @@ Dos nove requisitos funcionais da v2, três alteram a estrutura do sistema:
 |---|---|
 | **RF02**: envio de documentos comprobatórios | Introduz dado sensível e armazenamento de binários; exige segregação e controle de acesso próprios |
 | **RF04**: busca com filtros | Define o modelo de leitura e a estratégia de indexação |
+| **RF13**: identificação verificada da família | Torna a verificação bidirecional. O módulo Verificação deixa de ser um pedágio de entrada do cuidador e passa a ser condição de participação dos dois lados, o que muda o modelo de dados e a fila de moderação |
 | **RF06**: agendamento de plantões | Carrega a máquina de estados do plantão e a RN02. É o único ponto do sistema com transição de estado não trivial, e decide onde a regra mora |
 
 Os demais (RF01, RF03, RF05, RF07, RF10, RF11) são cadastro, mensageria e
@@ -159,7 +160,7 @@ proibitivo.
 | Módulo | Responsabilidade | RFs |
 |---|---|---|
 | **Identidade** | Cadastro, autenticação, sessão, perfis | RF01, RF03 |
-| **Verificação** | Envio de documentos, fila de moderação, decisão do administrador | RF02, RF11, RN01 |
+| **Verificação** | Envio de documentos, fila de moderação, decisão do administrador, dos dois lados | RF02, RF11, RF13, RN01, RN06 |
 | **Catálogo** | Perfis públicos de cuidadores, busca e filtros | RF04 |
 | **Contratação** | Plantões: solicitação, aceite, recusa, conclusão, cancelamento, aviso de atraso | RF06, RF10, RN02, RN05 |
 | **Reputação** | Avaliações mútuas e nota agregada | RF07, RN03, RN04 |
@@ -186,6 +187,7 @@ está.
 |---|---|
 | Módulos Verificação, Catálogo, Contratação e Reputação | Implementados como camada de serviços da API REST, com teste automatizado das regras RN01, RN02, RN03 e RN05 |
 | Máquina de estados do plantão (seção 6) | Implementada |
+| Separação em três camadas: rotas, serviços e repositórios (ADR-10) | Implementada. Nenhuma linha de SQL fora de `repositorios/` |
 | Módulo Identidade | Não implementado. A API atual não distingue quem chama |
 | Módulo Comunicação (chat, RF05) | Não implementado. Exige recurso de tempo real |
 | Documentos em bucket privado (ADR-04) | Não implementado. Hoje existe apenas o registro do documento, sem o binário |
@@ -559,8 +561,27 @@ dali. É o que permite à interface não duplicar a regra.
 
 **Contexto.** A arquitetura alvo prevê PostgreSQL gerenciado e um framework de aplicação estruturado. A primeira implementação da API precisava rodar na máquina de quem fosse avaliar, sem instalar servidor de banco, e precisava ficar pronta dentro de uma etapa da disciplina de Programação para Dispositivos Móveis, que exige Node.js com Express.
 **Decisão.** Decidi implementar a API com Express e SQLite em arquivo, mantendo as regras de negócio em uma camada de serviços separada das rotas.
-**Justificativa.** A separação entre rotas e serviços é o que torna a escolha reversível. As regras não conhecem o banco nem o framework HTTP: trocar SQLite por PostgreSQL mexe na camada de acesso a dados, não nas regras, e os testes das regras continuam valendo. O esquema usa chaves estrangeiras e restrições CHECK, que existem nos dois bancos.
+**Justificativa.** A reversibilidade depende de existir uma camada de acesso a dados separada, e o ADR-10 a criou: as regras não conhecem o banco nem o framework HTTP, então trocar SQLite por PostgreSQL mexe em `repositorios/` e os testes das regras continuam valendo. O esquema usa chaves estrangeiras e restrições CHECK, que existem nos dois bancos.
+
+> **Correção de registro.** Quando este ADR foi escrito, a justificativa acima
+> já estava redigida assim, mas não correspondia ao código: os serviços
+> continham SQL. A separação existia entre rotas e serviços, e não entre regra e
+> banco. O ADR-10 fechou essa distância. Fica registrado porque um documento de
+> arquitetura que descreve o sistema que se gostaria de ter, e não o que existe,
+> perde a função.
 **Consequências.** SQLite não suporta escrita concorrente de verdade, o que é irrelevante no volume atual e inaceitável em produção. A migração é dívida técnica assumida e está no risco R08. Em compensação, a API sobe com `npm install && npm start`, sem nenhuma dependência externa — o que também a torna demonstrável em sala, sem depender da rede.
+
+### ADR-10: Camada de repositórios separando regra de negócio e SQL
+
+**Contexto.** A API tinha duas camadas: rotas e serviços. Os serviços concentravam as regras de negócio **e** o SQL. Funcionava, mas criava três problemas. O primeiro é que a justificativa do ADR-09 — trocar de banco sem tocar nas regras — não se sustentava, porque as regras estavam misturadas com as consultas. O segundo é que uma mesma consulta aparecia escrita de formas ligeiramente diferentes em serviços distintos. O terceiro é que ler uma regra de negócio exigia atravessar SQL que não tinha nada a ver com ela.
+
+**Decisão.** Decidi introduzir `src/repositorios/`, um módulo por agregado, concentrando todo o SQL do sistema. Serviços passam a depender de repositórios e não do banco. Nenhum `db.prepare` existe fora dessa pasta.
+
+A fronteira tem uma regra que vale a pena explicitar: **o repositório não lança `AppError` e não conhece HTTP**. Quando não encontra, devolve `undefined`. É o serviço que transforma ausência em 404, porque "não encontrado" é uma resposta da aplicação, não do armazenamento. Sem essa regra, a camada de dados começaria a decidir código de status, e a separação viraria enfeite.
+
+**Alternativas.** *Manter duas camadas*: menos arquivos, e defensável num sistema pequeno. Descartada porque o ADR-09 depende desta separação para ser reversível, e porque a disciplina avalia justamente a estrutura. *ORM (Prisma, Sequelize, TypeORM)*: traria o mapeamento pronto, mas esconde o SQL em vez de organizá-lo, acrescenta dependência pesada e tiraria do projeto a parte em que o controle sobre a consulta é visível e avaliável. *Padrão Repository com interface e injeção de dependência*: a formalização completa não se paga num projeto deste tamanho, com um desenvolvedor; o módulo Node já dá o ponto de substituição.
+
+**Consequências.** Mais arquivos e uma indireção a mais para seguir ao ler o código. Em troca: as regras ficam legíveis sem ruído, a consulta de cada agregado tem um lugar só, e a migração do R08 passa a ser uma reescrita de pasta em vez de uma caçada por `db.prepare` espalhado. Os 17 testes passaram sem alteração durante a refatoração, o que é a evidência de que o comportamento não mudou — e também a razão de a refatoração ter sido segura de fazer em uma noite.
 
 ---
 
@@ -614,6 +635,9 @@ negócio e a verificação de fronteiras do R03 a cada push.
 | RF05 | Comunicação | API (WebSocket) | Não |
 | RF06, RF10 | Contratação | API + banco | Sim |
 | RF07 | Reputação | API + banco | Sim |
+| RF13 | Verificação | API + Object Storage + Painel Admin | Não |
+| RF14 | Catálogo + Contratação | API + banco | Não |
+| RF15 | Contratação | API + banco | Não |
 
 ---
 
@@ -627,6 +651,7 @@ negócio e a verificação de fronteiras do R03 a cada push.
 | R06 | Base de cuidadores vazia no lançamento, o problema do ovo e da galinha | Alto para o produto, não para a arquitetura | Fora do escopo técnico: tratar na estratégia de validação regional |
 | R07 | Nome **Zelio** é foneticamente próximo do concorrente **Zelo** | Médio: confusão de marca e risco de conflito de registro | Consultar busca no INPI antes de investir em identidade visual |
 | R08 | Migração de SQLite para PostgreSQL (ADR-09) revelar dependências do dialeto | Médio | Manter as regras fora da camada de dados; evitar recurso específico de SQLite no esquema |
+| R10 | A verificação de um lado só dar ao cuidador uma falsa sensação de segurança | **Alto**: a plataforma empresta credibilidade à família sem ter conferido nada sobre ela, substituindo uma desconfiança útil por confiança sem lastro | RF13 e RF14; enquanto não existirem, não afirmar na interface nada que sugira que a família foi conferida |
 | R09 | O projeto não ter validação com stakeholder registrada até o fim do semestre | **Alto**: todas as decisões de produto seguem apoiadas em suposição, e a disciplina cobra o registro em toda sprint review | Agendar e registrar as conversas; o registro é entregável de sprint, não etapa opcional |
 
 Os riscos R01 e R02 da v1 saíram: o primeiro dependia da hipótese H5, sobre
@@ -638,11 +663,15 @@ de escopo eliminou o primeiro e fechou o segundo.
 ## 14. Pendências para a v3
 
 1. Autenticação e sessão. A API hoje não distingue quem chama, e sem isso
-   nenhuma regra de autorização da seção 7.2 é aplicável de fato.
-2. Receber o binário dos documentos e implementar o ADR-04.
-3. Revisar ADR-08 à luz das entrevistas.
-4. Especificar o contrato da API em OpenAPI.
-5. Definir o modelo de negócio e seu impacto arquitetural. Se houver pagamento
+   nenhuma regra de autorização da seção 7.2 é aplicável de fato. É também
+   pré-requisito do RF13: não se verifica a identidade de quem o sistema não
+   sabe quem é.
+2. Verificação do lado da família (RF13, RF14, RF15) e o efeito dela sobre o
+   modelo de dados, a fila de moderação e o que a busca mostra antes do aceite.
+3. Receber o binário dos documentos e implementar o ADR-04.
+4. Revisar ADR-08 à luz das entrevistas.
+5. Especificar o contrato da API em OpenAPI.
+6. Definir o modelo de negócio e seu impacto arquitetural. Se houver pagamento
    intermediado, entram requisito de PCI e um módulo Financeiro.
 
 ---
