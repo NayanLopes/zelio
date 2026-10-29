@@ -18,7 +18,7 @@ aplicativo.
 | Pasta | Conteúdo |
 |---|---|
 | [`api/`](api/) | API REST em Node.js e Express, com banco SQLite |
-| [`docs/`](docs/) | Documentos de engenharia e de idealização |
+| [`docs/`](docs/) | Documentos de engenharia em PDF, com o texto-fonte em `docs/fonte/` |
 | [`prototipo/`](prototipo/) | Protótipo das telas |
 
 ## Protótipo
@@ -40,12 +40,18 @@ redução de escopo. Está mantida como registro; a versão válida é a do Figm
 |---|---|
 | [`docs/proposta-mobile.md`](docs/proposta-mobile.md) | Problema, público-alvo, funcionalidades e entidades |
 | [`docs/telas-e-endpoints.md`](docs/telas-e-endpoints.md) | Telas, fluxo de navegação e o endpoint que cada tela chama |
-| [`docs/documento-requisitos-v2.md`](docs/documento-requisitos-v2.md) | Requisitos funcionais e não funcionais, personas, regras de negócio |
-| [`docs/documento-arquitetura-v2.md`](docs/documento-arquitetura-v2.md) | Drivers, visões C4, modelo de dados, decisões de arquitetura |
-| [`docs/roteiro-entrevistas-v2.md`](docs/roteiro-entrevistas-v2.md) | Roteiro de coleta de dados com stakeholders |
-| [`docs/gestao-do-projeto.md`](docs/gestao-do-projeto.md) | Escopo, cronograma planejado e realizado, replanejamento |
+| [`docs/Zelio-requisitos.pdf`](docs/Zelio-requisitos.pdf) | Requisitos funcionais e não funcionais, personas, regras de negócio |
+| [`docs/Zelio-arquitetura.pdf`](docs/Zelio-arquitetura.pdf) | Drivers, visões C4, modelo de dados, decisões de arquitetura |
+| [`docs/Zelio-roteiro-entrevistas.pdf`](docs/Zelio-roteiro-entrevistas.pdf) | Roteiro de coleta de dados com stakeholders |
+| [`docs/Zelio-gestao-do-projeto.pdf`](docs/Zelio-gestao-do-projeto.pdf) | Escopo, cronograma planejado e realizado, replanejamento |
 | [`docs/validacao/`](docs/validacao/) | Registros das conversas com stakeholders |
 | [`api/README.md`](api/README.md) | Endpoints, regras de negócio e códigos de status da API |
+
+Os quatro documentos acima estão em PDF, com formatação ABNT. O texto-fonte de
+cada um fica em [`docs/fonte/`](docs/fonte/), em markdown: é de lá que o PDF é
+gerado, e é lá que o histórico do repositório mostra o que mudou de uma versão
+para a outra.
+
 
 > **Nota de escopo.** O projeto foi reduzido ao modelo de marketplace descrito
 > acima. A v2 dos três documentos de engenharia aplica esse corte e registra, em
