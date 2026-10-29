@@ -14,6 +14,7 @@ const cuidadores = require('../src/servicos/cuidadores');
 const familias = require('../src/servicos/familias');
 const plantoes = require('../src/servicos/plantoes');
 const avaliacoes = require('../src/servicos/avaliacoes');
+const avisos = require('../src/servicos/avisos');
 
 let aprovado, pendente, idoso;
 
@@ -133,4 +134,58 @@ test('nao se remove cuidador com plantao em aberto', () => {
   const p = plantoes.criar(plantaoBase({ data_inicio: '2027-06-01', data_fim: '2027-06-05' }));
   assert.throws(() => cuidadores.remover(aprovado.id), (e) => e.status === 409);
   plantoes.remover(p.id);
+});
+
+// ---------------------------------------------------------------- RF10
+// Avisos de atraso e cancelamento. A regra nova e a RN05: so plantao
+// aceito aceita aviso.
+
+test('RN05: so plantao aceito aceita aviso', () => {
+  const p = plantoes.criar(plantaoBase({ data_inicio: '2027-07-01', data_fim: '2027-07-03' }));
+
+  assert.throws(() => avisos.criar(p.id, { tipo: 'atraso', minutos_atraso: 30 }),
+    (e) => e.status === 409, 'plantao solicitado ainda nao tem compromisso a quebrar');
+
+  plantoes.mudarStatus(p.id, 'aceito');
+  const r = avisos.criar(p.id, { tipo: 'atraso', minutos_atraso: 40, mensagem: 'Chego mais tarde' });
+  assert.equal(r.aviso.minutos_atraso, 40);
+  assert.equal(r.plantao.status, 'aceito', 'aviso de atraso nao muda o estado');
+
+  plantoes.mudarStatus(p.id, 'concluido');
+  assert.throws(() => avisos.criar(p.id, { tipo: 'atraso', minutos_atraso: 10 }),
+    (e) => e.status === 409, 'plantao encerrado nao recebe aviso');
+});
+
+test('RF10: cancelamento avisado encerra o plantao pela maquina de estados', () => {
+  const p = plantoes.criar(plantaoBase({ data_inicio: '2027-08-01', data_fim: '2027-08-02' }));
+  plantoes.mudarStatus(p.id, 'aceito');
+
+  const r = avisos.criar(p.id, { tipo: 'cancelamento', mensagem: 'Fiquei doente' });
+  assert.equal(r.aviso.tipo, 'cancelamento');
+  assert.equal(r.plantao.status, 'cancelado');
+  assert.deepEqual(r.plantao.proximos_status, [], 'cancelado e estado final');
+});
+
+test('RF10: a forma do aviso depende do tipo', () => {
+  const p = plantoes.criar(plantaoBase({ data_inicio: '2027-09-01', data_fim: '2027-09-02' }));
+  plantoes.mudarStatus(p.id, 'aceito');
+
+  assert.throws(() => avisos.criar(p.id, { tipo: 'atraso' }),
+    (e) => e.status === 400 && 'minutos_atraso' in e.detalhes, 'atraso sem minutos');
+  assert.throws(() => avisos.criar(p.id, { tipo: 'cancelamento', minutos_atraso: 20 }),
+    (e) => e.status === 400 && 'minutos_atraso' in e.detalhes, 'cancelamento com minutos');
+
+  plantoes.mudarStatus(p.id, 'cancelado');
+});
+
+test('RF10: o aviso chega junto do plantao, sem segunda requisicao', () => {
+  const p = plantoes.criar(plantaoBase({ data_inicio: '2027-10-01', data_fim: '2027-10-02' }));
+  plantoes.mudarStatus(p.id, 'aceito');
+  avisos.criar(p.id, { tipo: 'atraso', minutos_atraso: 15 });
+
+  const naLista = plantoes.listar({ status: 'aceito' }).find((x) => x.id === p.id);
+  assert.equal(naLista.avisos.length, 1);
+  assert.equal(naLista.avisos[0].minutos_atraso, 15);
+
+  plantoes.mudarStatus(p.id, 'cancelado');
 });

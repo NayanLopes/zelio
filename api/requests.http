@@ -172,5 +172,40 @@ Content-Type: application/json
 ### Avaliacoes de um plantao
 GET {{base}}/plantoes/1/avaliacoes
 
+### ---------- AVISOS (RF10) ----------
+
+### Aviso de atraso em plantao aceito -> 201
+POST {{base}}/plantoes/3/avisos
+Content-Type: application/json
+
+{ "tipo": "atraso", "minutos_atraso": 40, "mensagem": "Consulta atrasou, chego mais tarde." }
+
+### Avisar sobre plantao ainda solicitado -> 409 (RN05)
+POST {{base}}/plantoes/2/avisos
+Content-Type: application/json
+
+{ "tipo": "atraso", "minutos_atraso": 30 }
+
+### Atraso sem informar os minutos -> 400
+POST {{base}}/plantoes/3/avisos
+Content-Type: application/json
+
+{ "tipo": "atraso" }
+
+### Cancelamento com minutos de atraso -> 400
+POST {{base}}/plantoes/3/avisos
+Content-Type: application/json
+
+{ "tipo": "cancelamento", "minutos_atraso": 20 }
+
+### Cancelamento avisado -> 201 e o plantao passa a 'cancelado'
+POST {{base}}/plantoes/3/avisos
+Content-Type: application/json
+
+{ "tipo": "cancelamento", "mensagem": "Fiquei doente, nao vou poder ir." }
+
+### Avisos de um plantao
+GET {{base}}/plantoes/3/avisos
+
 ### Rota que nao existe -> 404
 GET {{base}}/nao-existe
