@@ -45,3 +45,4 @@ docs/resumo-projeto-app-cuidadores.md
 # Saidas geradas por ferramenta
 Claude outputs/
 *.pdf
+!docs/*.pdf
