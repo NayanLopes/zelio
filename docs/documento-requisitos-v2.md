@@ -12,7 +12,7 @@
 | Versão | Data | O que mudou |
 |---|---|---|
 | v1 | 03/09/2026 | Primeira versão, com doze requisitos funcionais |
-| v2 | 28/10/2026 | Redução de escopo para o modelo de marketplace. Saíram RF08, RF09 e RF12; a seção 8 registra o motivo de cada saída |
+| v2 | 28/10/2026 | Redução de escopo para o modelo de marketplace. Saíram RF08, RF09 e RF12; a seção 8 registra o motivo de cada saída. Entraram a RN05, junto da implementação do RF10, e os requisitos RF13, RF14 e RF15 com a RN06, que levam a verificação para os dois lados (seção 1.3) |
 
 A numeração dos requisitos remanescentes foi mantida. Renumerar quebraria as
 referências no documento de arquitetura, no protótipo e nos commits já feitos, e
@@ -38,7 +38,30 @@ da vitrine** — quem não foi aprovado por um administrador não aparece na bus
 O ciclo começa e termina no aplicativo: a família busca, escolhe, conversa,
 solicita o plantão, e depois da conclusão as duas partes se avaliam.
 
-### 1.3 Limites do produto
+### 1.3 Segurança vale para os dois lados
+
+A v1 e a primeira metade da v2 trataram segurança como um problema da família:
+verificar antecedentes, conferir certificados, checar referências. Isso resolve
+metade do risco, e é a metade mais visível porque é quem paga que a sente.
+
+A outra metade é do cuidador. Quem aceita um plantão entra sozinho na casa de um
+desconhecido, muitas vezes em bairro que não conhece, para cuidar de uma pessoa
+em situação de dependência. O risco não é hipotético: é assédio, é trabalho
+diferente do combinado, é calote no fim do serviço, é não ter como provar que
+esteve lá.
+
+Uma plataforma que verifica só um dos lados não é neutra. Ela empresta
+credibilidade à família sem ter conferido nada sobre ela, e o cuidador acaba
+confiando no selo da plataforma em vez de na própria cautela. Isso é pior que
+não ter plataforma nenhuma, porque substitui uma desconfiança útil por uma
+confiança sem lastro.
+
+Daí vêm RF13, RF14 e RF15. Os três estão marcados como previstos: são decisão de
+produto tomada nesta versão, mas ainda sem validação com cuidadores — que é
+justamente quem pode dizer se isso resolve ou se o que assusta é outra coisa. A
+hipótese correspondente é a H10 do roteiro de entrevistas.
+
+### 1.4 Limites do produto
 
 O Zelio intermedia a contratação. Ele não acompanha a execução do cuidado.
 
@@ -92,6 +115,9 @@ de renda. Busca um jeito de ser encontrado sem depender de quem se lembra dele.
 | RF07 | Avaliação e comentário mútuo após a conclusão do plantão | Média | Implementado na API |
 | RF10 | Aviso à família em caso de cancelamento ou atraso do cuidador | Média | Implementado na API |
 | RF11 | Aprovação ou reprovação de cadastros de cuidadores pelo administrador | Alta | Implementado na API |
+| RF13 | Identificação verificada da família: documento com foto conferido antes de a família poder solicitar plantão | Alta | Previsto |
+| RF14 | O cuidador vê, antes de aceitar, quem é a família, o endereço aproximado, quem mais mora na casa e a reputação dela na plataforma | Alta | Previsto |
+| RF15 | Registro de início e fim do plantão pelas duas partes, formando comprovante de que o serviço ocorreu | Média | Previsto |
 
 A coluna de situação se refere à API REST em `api/`. "Implementado" significa que
 existe endpoint, validação e teste automático cobrindo o requisito.

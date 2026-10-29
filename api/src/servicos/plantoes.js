@@ -1,6 +1,8 @@
 'use strict';
-const { db } = require('../db');
 const AppError = require('../erros/AppError');
+const repo = require('../repositorios/plantoes');
+const avaliacoesRepo = require('../repositorios/avaliacoes');
+const avisosRepo = require('../repositorios/avisos');
 const cuidadores = require('./cuidadores');
 const familias = require('./familias');
 
@@ -20,37 +22,26 @@ const TRANSICOES = {
 
 function montar(linha) {
   if (!linha) return null;
-  const idoso = db.prepare('SELECT id, nome, idade, condicao, familia_id FROM idosos WHERE id = ?').get(linha.idoso_id);
-  const cuidador = db.prepare('SELECT id, nome, cidade, bairro FROM cuidadores WHERE id = ?').get(linha.cuidador_id);
-  const avaliacoes = db.prepare('SELECT id, autor, nota, comentario, criado_em FROM avaliacoes WHERE plantao_id = ?')
-    .all(linha.id);
-  // RF10 — a lista de plantoes da familia mostra o aviso em destaque, entao
-  // ele vem junto do plantao e nao exige uma segunda requisicao por item.
-  const avisos = db.prepare('SELECT id, tipo, minutos_atraso, mensagem, criado_em FROM avisos WHERE plantao_id = ? ORDER BY criado_em DESC')
-    .all(linha.id);
-  return { ...linha, idoso, cuidador, avaliacoes, avisos,
-           proximos_status: TRANSICOES[linha.status] };
+  return {
+    ...linha,
+    idoso: repo.idosoResumido(linha.idoso_id),
+    cuidador: repo.cuidadorResumido(linha.cuidador_id),
+    avaliacoes: avaliacoesRepo.resumoDoPlantao(linha.id),
+    // RF10 — a lista da familia mostra o aviso em destaque, entao ele vem
+    // junto do plantao e nao exige uma segunda requisicao por item.
+    avisos: avisosRepo.resumoDoPlantao(linha.id),
+    proximos_status: TRANSICOES[linha.status],
+  };
 }
 
 function buscarPorId(id) {
-  const p = db.prepare('SELECT * FROM plantoes WHERE id = ?').get(id);
+  const p = repo.buscarPorId(id);
   if (!p) throw AppError.naoEncontrado('Plantao');
   return montar(p);
 }
 
 function listar(filtros = {}) {
-  const cond = [];
-  const params = [];
-  if (filtros.cuidador_id) { cond.push('p.cuidador_id = ?'); params.push(filtros.cuidador_id); }
-  if (filtros.idoso_id)    { cond.push('p.idoso_id = ?');    params.push(filtros.idoso_id); }
-  if (filtros.status)      { cond.push('p.status = ?');      params.push(filtros.status); }
-  if (filtros.familia_id) {
-    cond.push('p.idoso_id IN (SELECT id FROM idosos WHERE familia_id = ?)');
-    params.push(filtros.familia_id);
-  }
-  const where = cond.length ? 'WHERE ' + cond.join(' AND ') : '';
-  return db.prepare(`SELECT p.* FROM plantoes p ${where} ORDER BY p.criado_em DESC`)
-           .all(...params).map(montar);
+  return repo.listar(filtros).map(montar);
 }
 
 function diasEntre(inicio, fim) {
@@ -87,23 +78,11 @@ function criar(dados) {
   if (horasEntre(dados.hora_inicio, dados.hora_fim) <= 0) {
     throw AppError.invalido('Dados invalidos', { hora_fim: 'deve ser posterior a hora_inicio' });
   }
-  const conflito = db.prepare(`
-    SELECT COUNT(*) AS n FROM plantoes
-    WHERE cuidador_id = ? AND status IN ('solicitado','aceito')
-      AND NOT (data_fim < ? OR data_inicio > ?)
-  `).get(dados.cuidador_id, dados.data_inicio, dados.data_fim).n;
-  if (conflito > 0) {
+  if (repo.contarSobreposicoes(dados.cuidador_id, dados.data_inicio, dados.data_fim) > 0) {
     throw AppError.conflito('O cuidador ja tem plantao em aberto nesse periodo');
   }
 
-  const valor = calcularValor(cuidador, dados);
-  const info = db.prepare(`
-    INSERT INTO plantoes (cuidador_id, idoso_id, modalidade, data_inicio, data_fim,
-                          hora_inicio, hora_fim, valor_total)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(dados.cuidador_id, dados.idoso_id, dados.modalidade, dados.data_inicio,
-         dados.data_fim, dados.hora_inicio, dados.hora_fim, valor);
-  return buscarPorId(Number(info.lastInsertRowid));
+  return buscarPorId(repo.inserir(dados, calcularValor(cuidador, dados)));
 }
 
 function mudarStatus(id, novo) {
@@ -115,14 +94,14 @@ function mudarStatus(id, novo) {
       (permitidos.length ? `Transicoes possiveis: ${permitidos.join(', ')}.` : 'Este plantao esta encerrado.')
     );
   }
-  db.prepare('UPDATE plantoes SET status = ? WHERE id = ?').run(novo, id);
+  repo.atualizarStatus(id, novo);
   return buscarPorId(id);
 }
 
 function remover(id) {
   const p = buscarPorId(id);
   if (p.status === 'concluido') throw AppError.conflito('Plantao concluido nao pode ser removido');
-  db.prepare('DELETE FROM plantoes WHERE id = ?').run(id);
+  repo.remover(id);
 }
 
 module.exports = { listar, buscarPorId, criar, mudarStatus, remover, TRANSICOES };

@@ -50,6 +50,7 @@ Cada hipótese está ligada aos requisitos que caem se ela for falsa. Isso é o 
 | H7 | Parte relevante das famílias contratantes tem **baixa familiaridade digital** | RNF01, RNF05 |
 | H8 | A verificação feita por uma plataforma **substitui, na prática, o peso da indicação pessoal** na decisão da família | RF02, RF11, RN01: **hipótese de maior risco** |
 | H9 | A família quer **conversar com o cuidador antes de contratar**, e é nessa conversa que a decisão se fecha | RF05 |
+| H10 | Cuidadores também sentem **risco ao aceitar um trabalho** de família desconhecida, e verificação do lado da família influenciaria a decisão de aceitar | RF13, RF14, RF15 |
 
 > **Sobre H8.** Com o corte de escopo, a hipótese de maior risco mudou de lado.
 > Antes era H5, sobre o cuidador aceitar preencher o registro diário. Agora é H8,
@@ -61,6 +62,13 @@ Cada hipótese está ligada aos requisitos que caem se ela for falsa. Isso é o 
 >
 > H2 e H5 saíram da lista na v2. As duas testavam o painel de acompanhamento, que
 > deixou de fazer parte do produto.
+
+> **Sobre H10.** Entrou depois de uma observação do professor da disciplina de
+> Programação para Dispositivos Móveis: o projeto estava tratando segurança como
+> problema de um lado só. As perguntas de H10 foram escritas de propósito sem
+> mencionar risco antes que o cuidador mencione — perguntar "você se sente
+> seguro?" faz a pessoa dizer que sim. Pergunta-se como ele decide aceitar, e
+> espera-se para ver o que aparece.
 
 ---
 
@@ -186,6 +194,10 @@ O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que
 
 11. As famílias costumam pedir documento, antecedentes, referência? Como é isso? *(H1, H8, RF02)*
 12. Como você faz hoje para uma família que não te conhece confiar em você? *(H8: do outro lado do balcão)*
+12a. E você, como decide se aceita trabalhar numa casa que não conhece? *(H10: deixe falar, não sugira riscos)*
+12b. Já aconteceu de chegar numa casa e o trabalho ser diferente do combinado? *(H10)*
+12c. Já teve problema para receber? *(H10: o calote é um risco que a plataforma não resolve sozinha)*
+12d. Tem alguém que você avisa quando vai para um plantão novo? *(H10: entender a prática de proteção que já existe)*
 13. Você se incomodaria em mandar antecedentes criminais e certificados para um aplicativo aprovar seu cadastro antes de você aparecer na busca? *(RF02, RF11)*
 14. E esperar alguns dias por essa aprovação, sem poder trabalhar pelo app nesse tempo? *(RN01: o custo real da verificação)*
 15. Ser avaliado com nota pelas famílias, como você vê? *(RF07)*
@@ -264,6 +276,7 @@ Surpresa (algo que não estava no nosso mapa): _________________
 | B22 | - | **RN02** |
 | A9, B23 | H6 | Modelo de negócio |
 | A22 | H7 | RNF01, RNF05 |
+| B12a, B12b, B12c, B12d, C5 | **H10** | **RF13, RF14, RF15, RN06** |
 | C3, C4 | - | RNF06 (LGPD), possíveis requisitos legais novos |
 
 A linha de H8 é a mais larga da matriz de propósito: sete perguntas, nos três
