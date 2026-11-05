@@ -2,6 +2,8 @@
 const { Router } = require('express');
 const s = require('../servicos/cuidadores');
 const { validar, regra, idNumerico } = require('../middlewares/validacao');
+const autenticacao = require('../servicos/autenticacao');
+const { autenticar, exigirPapel, exigirMesmoCuidador } = require('../middlewares/autenticacao');
 
 const rotas = Router();
 
@@ -17,7 +19,7 @@ const esquemaCriacao = {
   especialidades:   [regra.listaDeInteiros],
 };
 
-rotas.get('/', (req, res) => {
+rotas.get('/', autenticar, (req, res) => {
   const f = {
     cidade: req.query.cidade,
     bairro: req.query.bairro,
@@ -29,15 +31,19 @@ rotas.get('/', (req, res) => {
   res.json(s.listar(f));
 });
 
-rotas.get('/:id', (req, res) => res.json(s.buscarPorId(idNumerico(req.params.id))));
+rotas.get('/:id', autenticar, (req, res) => res.json(s.buscarPorId(idNumerico(req.params.id))));
 
 rotas.post('/', (req, res) => {
-  const dados = validar(req.body, esquemaCriacao);
+  const dados = validar(req.body, { ...esquemaCriacao, senha: [regra.texto(72)] });
   const criado = s.criar(dados);
+  if (dados.senha) {
+    autenticacao.registrar({ email: dados.email, senha: dados.senha,
+      papel: 'cuidador', cuidador_id: criado.id });
+  }
   res.status(201).location(`/cuidadores/${criado.id}`).json(criado);
 });
 
-rotas.patch('/:id', (req, res) => {
+rotas.patch('/:id', autenticar, exigirMesmoCuidador, (req, res) => {
   const dados = validar(req.body, {
     nome:             [regra.texto(120)],
     telefone:         [regra.texto(20)],
@@ -51,27 +57,27 @@ rotas.patch('/:id', (req, res) => {
   res.json(s.atualizar(idNumerico(req.params.id), dados));
 });
 
-rotas.patch('/:id/verificacao', (req, res) => {
+rotas.patch('/:id/verificacao', autenticar, exigirPapel('admin'), (req, res) => {
   const { status_verificacao } = validar(req.body, {
     status_verificacao: [regra.obrigatorio, regra.umDe(['pendente', 'aprovado', 'reprovado'])],
   });
   res.json(s.definirVerificacao(idNumerico(req.params.id), status_verificacao));
 });
 
-rotas.delete('/:id', (req, res) => {
+rotas.delete('/:id', autenticar, exigirPapel('admin'), (req, res) => {
   s.remover(idNumerico(req.params.id));
   res.status(204).end();
 });
 
-rotas.get('/:id/documentos', (req, res) => res.json(s.listarDocumentos(idNumerico(req.params.id))));
+rotas.get('/:id/documentos', autenticar, (req, res) => res.json(s.listarDocumentos(idNumerico(req.params.id))));
 
-rotas.post('/:id/documentos', (req, res) => {
+rotas.post('/:id/documentos', autenticar, exigirMesmoCuidador, (req, res) => {
   const { tipo } = validar(req.body, {
     tipo: [regra.obrigatorio, regra.umDe(['antecedentes', 'certificado', 'identidade'])],
   });
   res.status(201).json(s.adicionarDocumento(idNumerico(req.params.id), tipo));
 });
 
-rotas.get('/:id/avaliacoes', (req, res) => res.json(s.avaliacoesRecebidas(idNumerico(req.params.id))));
+rotas.get('/:id/avaliacoes', autenticar, (req, res) => res.json(s.avaliacoesRecebidas(idNumerico(req.params.id))));
 
 module.exports = rotas;

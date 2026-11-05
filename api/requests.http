@@ -172,6 +172,74 @@ Content-Type: application/json
 ### Avaliacoes de um plantao
 GET {{base}}/plantoes/1/avaliacoes
 
+### ---------- SESSAO ----------
+
+### Entrar como familia -> 201, devolve o token
+# @name entrar
+POST {{base}}/sessoes
+Content-Type: application/json
+
+{ "email": "marcia@exemplo.com", "senha": "zelio123" }
+
+### Guarde o token devolvido acima e use nas chamadas abaixo
+@token = {{entrar.response.body.token}}
+
+### Quem sou eu
+GET {{base}}/eu
+Authorization: Bearer {{token}}
+
+### Senha errada -> 401
+POST {{base}}/sessoes
+Content-Type: application/json
+
+{ "email": "marcia@exemplo.com", "senha": "errada" }
+
+### Sem token -> 401
+GET {{base}}/cuidadores
+
+### Entrar como cuidadora
+# @name entrarCuidadora
+POST {{base}}/sessoes
+Content-Type: application/json
+
+{ "email": "rosangela@exemplo.com", "senha": "zelio123" }
+
+@tokenCuidadora = {{entrarCuidadora.response.body.token}}
+
+### Entrar como administrador
+# @name entrarAdmin
+POST {{base}}/sessoes
+Content-Type: application/json
+
+{ "email": "admin@zelio.app", "senha": "zelio123" }
+
+@tokenAdmin = {{entrarAdmin.response.body.token}}
+
+### A familia tenta aceitar o proprio plantao -> 403 (RN02)
+PATCH {{base}}/plantoes/2/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "status": "aceito" }
+
+### A cuidadora aceita -> 200
+PATCH {{base}}/plantoes/2/status
+Authorization: Bearer {{tokenCuidadora}}
+Content-Type: application/json
+
+{ "status": "aceito" }
+
+### Aprovar cadastro sem ser admin -> 403 (RF11)
+PATCH {{base}}/cuidadores/2/verificacao
+Authorization: Bearer {{tokenCuidadora}}
+Content-Type: application/json
+
+{ "status_verificacao": "aprovado" }
+
+### Sair
+DELETE {{base}}/sessoes
+Authorization: Bearer {{token}}
+
 ### ---------- AVISOS (RF10) ----------
 
 ### Aviso de atraso em plantao aceito -> 201

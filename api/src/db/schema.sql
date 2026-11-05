@@ -1,5 +1,7 @@
 PRAGMA foreign_keys = ON;
 
+DROP TABLE IF EXISTS sessoes;
+DROP TABLE IF EXISTS usuarios;
 DROP TABLE IF EXISTS avisos;
 DROP TABLE IF EXISTS avaliacoes;
 DROP TABLE IF EXISTS plantoes;
@@ -101,6 +103,29 @@ CREATE TABLE avisos (
 );
 
 CREATE INDEX idx_avisos_plantao ON avisos (plantao_id, criado_em);
+
+CREATE TABLE usuarios (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  email       TEXT    NOT NULL UNIQUE,
+  senha_hash  TEXT    NOT NULL,
+  papel       TEXT    NOT NULL CHECK (papel IN ('familia','cuidador','admin')),
+  familia_id  INTEGER REFERENCES familias(id)   ON DELETE CASCADE,
+  cuidador_id INTEGER REFERENCES cuidadores(id) ON DELETE CASCADE,
+  criado_em   TEXT    NOT NULL DEFAULT (datetime('now')),
+  CHECK ((papel = 'familia'  AND familia_id  IS NOT NULL AND cuidador_id IS NULL)
+      OR (papel = 'cuidador' AND cuidador_id IS NOT NULL AND familia_id  IS NULL)
+      OR (papel = 'admin'    AND familia_id  IS NULL     AND cuidador_id IS NULL))
+);
+
+CREATE TABLE sessoes (
+  id          INTEGER PRIMARY KEY AUTOINCREMENT,
+  usuario_id  INTEGER NOT NULL REFERENCES usuarios(id) ON DELETE CASCADE,
+  token_hash  TEXT    NOT NULL UNIQUE,
+  criado_em   TEXT    NOT NULL DEFAULT (datetime('now')),
+  expira_em   TEXT    NOT NULL
+);
+
+CREATE INDEX idx_sessoes_token ON sessoes (token_hash);
 
 CREATE INDEX idx_cuidadores_busca  ON cuidadores (status_verificacao, cidade, bairro);
 CREATE INDEX idx_plantoes_cuidador ON plantoes (cuidador_id, status);
