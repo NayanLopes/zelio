@@ -44,7 +44,6 @@ redução de escopo. Está mantida como registro; a versão válida é a do Figm
 | [`docs/Zelio-arquitetura.pdf`](docs/Zelio-arquitetura.pdf) | Drivers, visões C4, modelo de dados, decisões de arquitetura |
 | [`docs/Zelio-roteiro-entrevistas.pdf`](docs/Zelio-roteiro-entrevistas.pdf) | Roteiro de coleta de dados com stakeholders |
 | [`docs/Zelio-gestao-do-projeto.pdf`](docs/Zelio-gestao-do-projeto.pdf) | Escopo, cronograma planejado e realizado, replanejamento |
-| [`docs/validacao/`](docs/validacao/) | Registros das conversas com stakeholders |
 | [`api/README.md`](api/README.md) | Endpoints, regras de negócio e códigos de status da API |
 
 Os quatro documentos acima estão em PDF, com formatação ABNT. O texto-fonte de
