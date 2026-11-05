@@ -148,10 +148,7 @@ foi entregue em nenhuma. Ela não depende de código e não pode ser recuperada 
 fim do semestre: duas entrevistas feitas em dezembro não embasam decisões
 tomadas em setembro.
 
-Por isso ela é a primeira tarefa da Sprint 4, e não a última. O registro da
-primeira conversa, feita de forma informal, está em `docs/validacao/` e é
-tratado pelo que é: uma conversa sem método, anotada depois, que serve de
-indício e não de evidência.
+Por isso ela é a primeira tarefa da Sprint 4, e não a última.
 
 ---
 

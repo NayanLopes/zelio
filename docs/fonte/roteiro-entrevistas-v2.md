@@ -5,7 +5,7 @@
 **Disciplina:** Projeto Integrado em Engenharia de Software III
 **Professora:** Leonara Braz (2026.2, UFC Campus Quixadá)
 **Aluno:** Vitor Nayan
-**Versão:** 2.0
+**Versão:** 2.1
 **Documento relacionado:** `documento-requisitos-v2.md`
 
 ---
@@ -15,6 +15,7 @@
 | Versão | Data | O que mudou |
 |---|---|---|
 | v1 | 20/08/2026 | Primeira versão, com sete hipóteses |
+| v2.1 | 05/11/2026 | Entraram A14a, sobre visita de experiência, e A22a, que separa quem consegue usar de quem usa |
 | v2 | 28/10/2026 | Saíram H2 e H5, que testavam o painel de acompanhamento, junto dos blocos de pergunta ligados a ele. Entraram H8 e H9. O bloco de apresentação da solução foi reescrito para o produto atual |
 
 H2 e H5 testavam funcionalidades que não existem mais. Perguntar sobre elas
@@ -152,6 +153,7 @@ O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que
 12. Fora essa pessoa, você considerou alguém que **não** tinha sido indicado por conhecido? O que aconteceu? *(H8)*
 13. Imagina que você não tivesse ninguém para indicar. O que você faria? *(H8: deixe a pessoa pensar, não ofereça o app como saída)*
 14. O que precisaria estar comprovado sobre alguém desconhecido para você deixar essa pessoa sozinha com [o idoso]? *(H8: essa é a pergunta central da entrevista)*
+14a. Se tudo isso estivesse comprovado, você contrataria direto, ou ainda quereria alguma coisa antes? *(H8: só pergunte depois que a pessoa terminar a 14. A resposta costuma terminar em "conhecer pessoalmente", e papel nenhum substitui isso. Se ela falar em visita, teste ou período de experiência, explore: quanto tempo, acompanhada ou não, remunerada)*
 15. Você já contratou algum serviço para dentro de casa por aplicativo? Diarista, montador, cuidador? Como foi? *(H8: comportamento passado vale mais que opinião)*
 
 ### Bloco 4: Especialização (5 min)
@@ -168,6 +170,7 @@ O erro mais comum em coleta de requisitos é o entrevistado dizer o que acha que
 20. Se isso existisse na última vez, você teria usado? Por quê? *(H8)*
 21. Você conversaria com a pessoa antes de contratar, ou contrataria direto pelo perfil? *(H9)*
 22. Quem na sua família conseguiria usar um app desses sozinho? *(H7, RNF01)*
+22a. E quem usaria no dia a dia? *(H7: separe quem consegue de quem usa. O usuário real tende a ser o filho, e não o idoso, o que muda a interface inteira)*
 23. Tem alguém que você acha que eu deveria conversar sobre isso?
 
 ---
@@ -266,7 +269,7 @@ Surpresa (algo que não estava no nosso mapa): _________________
 | Pergunta | Hipótese | Requisito impactado |
 |---|---|---|
 | A7, A8, B11 | H1 | RF02, RF11, RN01, RNF02 |
-| A12, A13, A14, A15, A20, B12, C5 | **H8** | **RF02, RF11, RN01** |
+| A12, A13, A14, A14a, A15, A20, B12, C5 | **H8** | **RF02, RF11, RN01** |
 | A16, A17 | H3 | **RF01, RF04** |
 | A21, B17 | H9 | RF05 |
 | A11 | - | RF10 |
@@ -275,11 +278,11 @@ Surpresa (algo que não estava no nosso mapa): _________________
 | B15, B16 | - | RF07, RN03, RN04 |
 | B22 | - | **RN02** |
 | A9, B23 | H6 | Modelo de negócio |
-| A22 | H7 | RNF01, RNF05 |
+| A22, A22a | H7 | RNF01, RNF05 |
 | B12a, B12b, B12c, B12d, C5 | **H10** | **RF13, RF14, RF15, RN06** |
 | C3, C4 | - | RNF06 (LGPD), possíveis requisitos legais novos |
 
-A linha de H8 é a mais larga da matriz de propósito: sete perguntas, nos três
+A linha de H8 é a mais larga da matriz de propósito: oito perguntas, nos três
 roteiros, cercando a mesma hipótese por ângulos diferentes. É o que se faz com a
 hipótese de maior risco — não se pergunta uma vez e se dá por satisfeito.
 
@@ -292,7 +295,6 @@ hipótese de maior risco — não se pergunta uma vez e se dá por satisfeito.
 3. **Fechar o veredito das hipóteses** em uma tabela consolidada: confirmada, refutada ou inconclusiva, com a evidência (citação + ID da entrevista).
 4. **Atualizar o documento de requisitos para v3:** ajustar personas com dados reais, repriorizar os requisitos, registrar requisitos novos e mover para fora de escopo o que não se sustentou.
 5. **Registrar no documento a origem de cada mudança** (por exemplo: "RF05 repriorizado para Alta após ENT-02 e ENT-04"). A rastreabilidade da evidência até o requisito é exatamente o que a disciplina cobra.
-6. **Guardar a ficha preenchida** em `docs/validacao/`, uma por entrevista, anonimizada. A ficha é entregável de sprint review, e não anotação pessoal.
 
 ---
 
