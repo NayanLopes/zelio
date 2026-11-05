@@ -42,6 +42,40 @@ familias ──< idosos ──< plantoes >── cuidadores ──< documentos
 | `plantoes` | O serviço contratado. Liga um cuidador a um idoso. |
 | `avaliacoes` | Nota e comentário após a conclusão. Uma por lado. |
 | `avisos` | Atraso ou cancelamento comunicado pelo cuidador durante um plantão aceito. |
+| `usuarios` | Credencial de acesso, ligada a uma família, a um cuidador, ou a ninguém no caso do administrador. |
+| `sessoes` | Token ativo. Guarda o resumo do token, nunca o token em si. |
+
+## Autenticação
+
+`POST /sessoes` com e-mail e senha devolve um token. Ele vai em todas as outras
+chamadas no cabeçalho `Authorization: Bearer <token>` e vale sete dias.
+`DELETE /sessoes` encerra a sessão.
+
+Ficam públicas apenas quatro rotas: a raiz, `GET /especialidades`,
+`POST /sessoes` e os dois cadastros, `POST /cuidadores` e `POST /familias`.
+Qualquer outra sem token responde 401.
+
+Cada usuário tem um papel: `familia`, `cuidador` ou `admin`. O papel decide o
+que a rota aceita:
+
+| Ação | Quem pode |
+|---|---|
+| Aprovar ou reprovar cadastro de cuidador | `admin` (RF11) |
+| Mover plantão para `aceito` ou `recusado` | só o cuidador daquele plantão (RN02) |
+| Mover plantão para `concluido` ou `cancelado` | qualquer uma das duas partes |
+| Avisar atraso ou cancelamento | só o cuidador daquele plantão (RF10) |
+| Criar plantão | `familia` |
+| Ler ou avaliar um plantão | só quem é parte dele |
+| Alterar um cadastro | o dono dele, ou `admin` |
+
+A senha é guardada com `scrypt` e sal sorteado por usuário, usando o módulo
+`crypto` do próprio Node. Não há dependência nova para isso. O token é aleatório
+e opaco, e no banco fica apenas o seu resumo SHA-256: um vazamento da tabela
+`sessoes` não devolve tokens utilizáveis.
+
+Token opaco em tabela foi escolhido no lugar de JWT por ser revogável. `DELETE
+/sessoes` apaga a linha e o token morre na hora, o que um JWT não faz sem uma
+lista de bloqueio à parte.
 
 ## Endpoints
 
@@ -65,6 +99,9 @@ familias ──< idosos ──< plantoes >── cuidadores ──< documentos
 | DELETE | `/familias/:id` | Remove |
 | GET | `/familias/:id/idosos` | Idosos da família |
 | POST | `/familias/:id/idosos` | Cadastra idoso |
+| POST | `/sessoes` | Entra e devolve o token |
+| DELETE | `/sessoes` | Sai e revoga o token |
+| GET | `/eu` | Quem é o dono do token |
 | GET | `/plantoes` | Filtros: `status`, `cuidador_id`, `idoso_id`, `familia_id` |
 | GET | `/plantoes/:id` | Um plantão, com as transições possíveis |
 | POST | `/plantoes` | Família solicita. Nasce `solicitado` |
@@ -123,6 +160,8 @@ que se cruzam.
 | 201 | Recurso criado, com cabeçalho `Location` |
 | 204 | Remoção bem-sucedida, sem corpo |
 | 400 | Dados inválidos. O corpo traz `detalhes` com o problema de cada campo |
+| 401 | Sem token, token inválido ou sessão expirada |
+| 403 | Autenticado, mas sem direito sobre aquele recurso |
 | 404 | Recurso ou rota inexistente |
 | 409 | Conflito com uma regra de negócio ou com o estado atual |
 | 500 | Erro não previsto |
@@ -147,13 +186,14 @@ src/
   repositorios/          acesso ao banco — todo o SQL do sistema
   middlewares/
     validacao.js         validação declarativa, campo a campo
+    autenticacao.js      resolve o token e guarda as rotas por papel
     erros.js             404 e tratador central de erros
   erros/AppError.js      erro com código HTTP
   db/
     driver.js            adaptador entre better-sqlite3 e node:sqlite
     schema.sql           tabelas, chaves estrangeiras e CHECKs
     seed.js              recria o banco com dados de exemplo
-testes/regras.test.js    17 testes das regras de negócio
+testes/regras.test.js    21 testes das regras de negócio
 requests.http            exemplos de requisição
 ```
 
@@ -169,7 +209,7 @@ O que cada uma pode e não pode fazer:
 
 | Camada | Conhece | Não conhece |
 |---|---|---|
-| `rotas` | `req`, `res`, códigos de status | regra de negócio, SQL |
+| `rotas` | `req`, `res`, códigos de status, quem está chamando | regra de negócio, SQL |
 | `servicos` | regras, outros serviços, repositórios | `req`, `res`, SQL |
 | `repositorios` | SQL e o formato das tabelas | regra de negócio, HTTP |
 
