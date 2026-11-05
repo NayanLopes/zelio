@@ -98,7 +98,6 @@ trabalho hoje chega por indicação, em rajadas, sem previsibilidade de agenda n
 de renda. Busca um jeito de ser encontrado sem depender de quem se lembra dele.
 
 > As duas personas vieram da definição inicial do projeto e seguem em validação.
-> O registro das conversas está em `docs/validacao/`.
 
 ---
 

@@ -295,7 +295,6 @@ hipótese de maior risco — não se pergunta uma vez e se dá por satisfeito.
 3. **Fechar o veredito das hipóteses** em uma tabela consolidada: confirmada, refutada ou inconclusiva, com a evidência (citação + ID da entrevista).
 4. **Atualizar o documento de requisitos para v3:** ajustar personas com dados reais, repriorizar os requisitos, registrar requisitos novos e mover para fora de escopo o que não se sustentou.
 5. **Registrar no documento a origem de cada mudança** (por exemplo: "RF05 repriorizado para Alta após ENT-02 e ENT-04"). A rastreabilidade da evidência até o requisito é exatamente o que a disciplina cobra.
-6. **Guardar a ficha preenchida** em `docs/validacao/`, uma por entrevista, anonimizada. A ficha é entregável de sprint review, e não anotação pessoal.
 
 ---
 
