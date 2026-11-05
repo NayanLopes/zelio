@@ -58,8 +58,16 @@ db.prepare('INSERT INTO avaliacoes (plantao_id, autor, nota, comentario) VALUES 
 db.prepare('INSERT INTO avisos (plantao_id, tipo, minutos_atraso, mensagem) VALUES (?, ?, ?, ?)')
   .run(p3, 'atraso', 40, 'Consulta medica da manha atrasou. Chego 40 minutos depois.');
 
+const autenticacao = require('../servicos/autenticacao');
+const SENHA = 'zelio123';
+autenticacao.registrar({ email: 'admin@zelio.app', senha: SENHA, papel: 'admin' });
+autenticacao.registrar({ email: 'marcia@exemplo.com', senha: SENHA, papel: 'familia', familia_id: f1 });
+autenticacao.registrar({ email: 'rosangela@exemplo.com', senha: SENHA, papel: 'cuidador', cuidador_id: 1 });
+
 const conta = (t) => db.prepare(`SELECT COUNT(*) AS n FROM ${t}`).get().n;
 console.log(`Banco recriado em ${arquivo} (driver: ${driver})`);
-for (const t of ['especialidades', 'cuidadores', 'familias', 'idosos', 'plantoes', 'avaliacoes', 'avisos']) {
+for (const t of ['especialidades', 'cuidadores', 'familias', 'idosos', 'plantoes', 'avaliacoes', 'avisos', 'usuarios']) {
   console.log(`  ${t.padEnd(16)} ${conta(t)}`);
 }
+console.log(`\nUsuarios de exemplo, senha ${SENHA}:`);
+console.log('  admin@zelio.app · marcia@exemplo.com · rosangela@exemplo.com');

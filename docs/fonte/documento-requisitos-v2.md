@@ -106,9 +106,9 @@ de renda. Busca um jeito de ser encontrado sem depender de quem se lembra dele.
 
 | ID | Requisito | Prioridade | Situação |
 |---|---|---|---|
-| RF01 | Cadastro de cuidadores com dados pessoais, experiência, certificações e especialidades | Alta | Implementado na API |
+| RF01 | Cadastro de cuidadores com dados pessoais, experiência, certificações e especialidades | Alta | Implementado na API, com autenticação |
 | RF02 | Envio de documentos comprobatórios (antecedentes criminais, certificados) para verificação | Alta | Implementado na API |
-| RF03 | Cadastro de famílias com dados do idoso e tipo de cuidado necessário | Alta | Implementado na API |
+| RF03 | Cadastro de famílias com dados do idoso e tipo de cuidado necessário | Alta | Implementado na API, com autenticação |
 | RF04 | Busca e filtro de cuidadores por especialidade, localização e avaliação | Alta | Implementado na API |
 | RF05 | Chat entre família e cuidador antes da contratação | Alta | Previsto — exige recurso de tempo real |
 | RF06 | Agendamento de plantões nas modalidades horista, diária e mensal | Alta | Implementado na API |

@@ -181,3 +181,57 @@ test('RF10: o aviso chega junto do plantao, sem segunda requisicao', () => {
 
   plantoes.mudarStatus(p.id, 'cancelado');
 });
+
+const autenticacao = require('../src/servicos/autenticacao');
+
+test('autenticacao: senha nao volta, e senha errada responde 401', () => {
+  const fam = familias.criar({ responsavel: 'Rita', email: 'rita@e.com', telefone: '1',
+    cidade: 'Quixada', bairro: 'Centro' });
+  const u = autenticacao.registrar({ email: 'rita@e.com', senha: 'segredo123',
+    papel: 'familia', familia_id: fam.id });
+
+  assert.equal(u.senha_hash, undefined, 'o hash nunca sai do servico');
+  assert.throws(() => autenticacao.entrar('rita@e.com', 'errada'), (e) => e.status === 401);
+  assert.throws(() => autenticacao.entrar('naoexiste@e.com', 'segredo123'), (e) => e.status === 401);
+  assert.throws(() => autenticacao.registrar({ email: 'rita@e.com', senha: 'outra123',
+    papel: 'familia', familia_id: fam.id }), (e) => e.status === 409);
+});
+
+test('autenticacao: a mesma senha gera hashes diferentes', () => {
+  const a = autenticacao.cifrar('mesmasenha');
+  const b = autenticacao.cifrar('mesmasenha');
+  assert.notEqual(a, b, 'o sal tem que ser sorteado por usuario');
+  assert.ok(!a.includes('mesmasenha'), 'a senha nao aparece no hash');
+});
+
+test('sessao: o token resolve o usuario e morre ao sair', () => {
+  const fam = familias.criar({ responsavel: 'Joana', email: 'joana@e.com', telefone: '1',
+    cidade: 'Quixada', bairro: 'Centro' });
+  autenticacao.registrar({ email: 'joana@e.com', senha: 'segredo123',
+    papel: 'familia', familia_id: fam.id });
+
+  const s = autenticacao.entrar('joana@e.com', 'segredo123');
+  assert.equal(s.token.length, 64);
+  assert.equal(s.usuario.familia_id, fam.id);
+  assert.equal(s.usuario.papel, 'familia');
+
+  assert.equal(autenticacao.porToken(s.token).id, s.usuario.id);
+  autenticacao.sair(s.token);
+  assert.equal(autenticacao.porToken(s.token), null, 'token revogado nao resolve mais');
+  assert.equal(autenticacao.porToken('token que nunca existiu'), null);
+});
+
+test('sessao: duas entradas geram tokens distintos e independentes', () => {
+  const fam = familias.criar({ responsavel: 'Clara', email: 'clara@e.com', telefone: '1',
+    cidade: 'Quixada', bairro: 'Centro' });
+  autenticacao.registrar({ email: 'clara@e.com', senha: 'segredo123',
+    papel: 'familia', familia_id: fam.id });
+
+  const a = autenticacao.entrar('clara@e.com', 'segredo123');
+  const b = autenticacao.entrar('clara@e.com', 'segredo123');
+  assert.notEqual(a.token, b.token);
+
+  autenticacao.sair(a.token);
+  assert.equal(autenticacao.porToken(a.token), null);
+  assert.ok(autenticacao.porToken(b.token), 'sair de um aparelho nao derruba o outro');
+});

@@ -16,6 +16,7 @@
 |---|---|---|
 | v1 | 27/08/2026 | Primeira versão, derivada do documento de requisitos v1 |
 | v2 | 28/10/2026 | Redução de escopo para marketplace. Saiu o módulo Acompanhamento e tudo que dependia dele: ADR-05, ADR-06, CQ04, CQ05 e os riscos R01 e R02. Entraram o ADR-09, que registra a distância entre a arquitetura alvo e a implementação atual, e o ADR-10, que separa regra de negócio de acesso a dados |
+| v2.2 | 05/11/2026 | Autenticação e autorização implementadas. Entra o ADR-11 |
 
 A v1 descrevia um produto que acompanhava a execução do cuidado. A v2 descreve um
 produto que intermedia a contratação e para por ali. Não é um corte de
@@ -187,8 +188,9 @@ está.
 |---|---|
 | Módulos Verificação, Catálogo, Contratação e Reputação | Implementados como camada de serviços da API REST, com teste automatizado das regras RN01, RN02, RN03 e RN05 |
 | Máquina de estados do plantão (seção 6) | Implementada |
+| Autenticação, sessão e autorização (ADR-11) | Implementada |
 | Separação em três camadas: rotas, serviços e repositórios (ADR-10) | Implementada. Nenhuma linha de SQL fora de `repositorios/` |
-| Módulo Identidade | Não implementado. A API atual não distingue quem chama |
+| Módulo Identidade | Implementado. Sessão por token opaco, senha com `scrypt`, autorização por papel e por relação (ADR-11) |
 | Módulo Comunicação (chat, RF05) | Não implementado. Exige recurso de tempo real |
 | Documentos em bucket privado (ADR-04) | Não implementado. Hoje existe apenas o registro do documento, sem o binário |
 | Aplicativo mobile | Não implementado. Existe protótipo navegável de oito telas |
@@ -583,6 +585,20 @@ A fronteira tem uma regra que vale a pena explicitar: **o repositório não lan�
 
 **Consequências.** Mais arquivos e uma indireção a mais para seguir ao ler o código. Em troca: as regras ficam legíveis sem ruído, a consulta de cada agregado tem um lugar só, e a migração do R08 passa a ser uma reescrita de pasta em vez de uma caçada por `db.prepare` espalhado. Os 17 testes passaram sem alteração durante a refatoração, o que é a evidência de que o comportamento não mudou — e também a razão de a refatoração ter sido segura de fazer em uma noite.
 
+### ADR-11: Sessão por token opaco em tabela, e não JWT
+
+**Contexto.** A API não distinguia quem chamava, o que deixava toda a seção 7.2 sem efeito prático: as regras de acesso existiam no papel e não no código. Era a pendência número 1 da seção 14, e pré-requisito do RF13.
+
+**Decisão.** Decidi autenticar por sessão: `POST /sessoes` devolve um token aleatório de 32 bytes, guardado no banco apenas como resumo SHA-256, com validade de sete dias. A senha é derivada com `scrypt` e sal sorteado por usuário, pelo módulo `crypto` do próprio Node.
+
+**Alternativas.** *JWT*: o padrão de fato, sem estado no servidor. Descartado porque não é revogável: sair de um aparelho exigiria uma lista de bloqueio, que é exatamente o estado no servidor que o JWT prometia evitar, só que com mais peças. *bcrypt ou argon2 para a senha*: melhores que `scrypt` em dureza de memória configurável, mas ambos compilam binário nativo, e o projeto já carrega esse custo com o `better-sqlite3`, que atrapalha quem clona o repositório em outro sistema operacional. `scrypt` vem no Node e resolve o caso.
+
+**Onde a autorização mora.** As guardas ficam em `middlewares/autenticacao.js`, entre as rotas e os serviços, e não dentro dos serviços. A razão é que "quem está chamando" é fato da requisição, não do domínio: um plantão não muda de natureza conforme quem o lê. Manter isso fora dos serviços preservou os 17 testes existentes sem uma linha alterada durante a implementação, o que é a evidência de que o domínio não foi contaminado.
+
+A guarda mais interessante é a da mudança de estado. Mover para `aceito` ou `recusado` é privativo do cuidador daquele plantão, porque é nisso que a RN02 consiste; mover para `concluido` ou `cancelado` qualquer uma das duas partes pode. Antes disso, a RN02 existia só como tabela de transições: qualquer pessoa com o identificador do plantão podia aceitar em nome do cuidador.
+
+**Consequências.** Toda requisição autenticada custa uma consulta à tabela de sessões, o que é irrelevante neste volume e é o preço da revogação. Sessões expiradas são varridas a cada login. Falta ligar o cadastro de documento (ADR-04) ao usuário dono, e falta recuperação de senha, que não existe neste MVP.
+
 ---
 
 ## 10. Visão de implantação
@@ -662,13 +678,10 @@ de escopo eliminou o primeiro e fechou o segundo.
 
 ## 14. Pendências para a v3
 
-1. Autenticação e sessão. A API hoje não distingue quem chama, e sem isso
-   nenhuma regra de autorização da seção 7.2 é aplicável de fato. É também
-   pré-requisito do RF13: não se verifica a identidade de quem o sistema não
-   sabe quem é.
-2. Verificação do lado da família (RF13, RF14, RF15) e o efeito dela sobre o
+1. Verificação do lado da família (RF13, RF14, RF15) e o efeito dela sobre o
    modelo de dados, a fila de moderação e o que a busca mostra antes do aceite.
-3. Receber o binário dos documentos e implementar o ADR-04.
+2. Receber o binário dos documentos e implementar o ADR-04.
+3. Recuperação de senha, que o ADR-11 deixou de fora.
 4. Revisar ADR-08 à luz das entrevistas.
 5. Especificar o contrato da API em OpenAPI.
 6. Definir o modelo de negócio e seu impacto arquitetural. Se houver pagamento
