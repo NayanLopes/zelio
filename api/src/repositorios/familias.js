@@ -33,5 +33,15 @@ function inserirIdoso(familiaId, dados) {
   return db.prepare('SELECT * FROM idosos WHERE id = ?').get(Number(info.lastInsertRowid));
 }
 
+const atualizarIdoso = (idosoId, campos, valores) =>
+  db.prepare(`UPDATE idosos SET ${campos.map((c) => `${c} = ?`).join(', ')} WHERE id = ?`)
+    .run(...valores, idosoId);
+
+const removerIdoso = (idosoId) => db.prepare('DELETE FROM idosos WHERE id = ?').run(idosoId);
+
+const contarPlantoesDoIdoso = (idosoId) =>
+  db.prepare('SELECT COUNT(*) AS n FROM plantoes WHERE idoso_id = ?').get(idosoId).n;
+
 module.exports = { buscarPorId, listar, inserir, atualizar, remover, contarPlantoesEmAberto,
-                   listarIdosos, buscarIdoso, inserirIdoso };
+                   listarIdosos, buscarIdoso, inserirIdoso, atualizarIdoso, removerIdoso,
+                   contarPlantoesDoIdoso };

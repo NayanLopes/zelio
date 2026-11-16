@@ -53,4 +53,18 @@ rotas.post('/:id/idosos', autenticar, exigirMesmaFamilia, (req, res) => {
   res.status(201).json(s.adicionarIdoso(idNumerico(req.params.id), dados));
 });
 
+rotas.patch('/:id/idosos/:idosoId', autenticar, exigirMesmaFamilia, (req, res) => {
+  const dados = validar(req.body, {
+    nome:     [regra.texto(120)],
+    idade:    [regra.inteiro(40, 120)],
+    condicao: [regra.texto(300)],
+  });
+  res.json(s.atualizarIdoso(idNumerico(req.params.id), idNumerico(req.params.idosoId, 'idosoId'), dados));
+});
+
+rotas.delete('/:id/idosos/:idosoId', autenticar, exigirMesmaFamilia, (req, res) => {
+  s.removerIdoso(idNumerico(req.params.id), idNumerico(req.params.idosoId, 'idosoId'));
+  res.status(204).end();
+});
+
 module.exports = rotas;

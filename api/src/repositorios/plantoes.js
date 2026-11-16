@@ -44,5 +44,8 @@ const cuidadorResumido = (id) =>
 const idosoResumido = (id) =>
   db.prepare('SELECT id, nome, idade, condicao, familia_id FROM idosos WHERE id = ?').get(id);
 
+const familiaResumida = (id) =>
+  db.prepare('SELECT id, responsavel, cidade, bairro FROM familias WHERE id = ?').get(id);
+
 module.exports = { buscarPorId, listar, inserir, atualizarStatus, remover,
-                   contarSobreposicoes, cuidadorResumido, idosoResumido };
+                   contarSobreposicoes, cuidadorResumido, idosoResumido, familiaResumida };

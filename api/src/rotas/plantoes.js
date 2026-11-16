@@ -14,6 +14,8 @@ rotas.get('/', autenticar, (req, res) => {
   for (const k of ['cuidador_id', 'idoso_id', 'familia_id']) {
     if (req.query[k]) f[k] = idNumerico(req.query[k], k);
   }
+  if (req.usuario.papel === 'familia') f.familia_id = req.usuario.familia_id;
+  if (req.usuario.papel === 'cuidador') f.cuidador_id = req.usuario.cuidador_id;
   res.json(s.listar(f));
 });
 

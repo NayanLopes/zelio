@@ -235,3 +235,49 @@ test('sessao: duas entradas geram tokens distintos e independentes', () => {
   assert.equal(autenticacao.porToken(a.token), null);
   assert.ok(autenticacao.porToken(b.token), 'sair de um aparelho nao derruba o outro');
 });
+
+test('idoso: a familia edita os dados de quem cuida', () => {
+  const fam = familias.criar({ responsavel: 'Lucia', email: 'lucia@e.com', telefone: '1',
+    cidade: 'Quixada', bairro: 'Centro' });
+  const i = familias.adicionarIdoso(fam.id, { nome: 'Jose', idade: 77 });
+
+  const editado = familias.atualizarIdoso(fam.id, i.id, { idade: 78, condicao: 'Diabetes' });
+  assert.equal(editado.nome, 'Jose');
+  assert.equal(editado.idade, 78);
+  assert.equal(editado.condicao, 'Diabetes');
+
+  assert.throws(() => familias.atualizarIdoso(fam.id, i.id, {}), (e) => e.status === 400);
+});
+
+test('idoso: uma familia nao alcanca o idoso de outra', () => {
+  const outra = familias.criar({ responsavel: 'Paulo', email: 'paulo@e.com', telefone: '1',
+    cidade: 'Quixada', bairro: 'Centro' });
+  assert.throws(() => familias.atualizarIdoso(outra.id, idoso.id, { idade: 90 }),
+    (e) => e.status === 404);
+  assert.throws(() => familias.removerIdoso(outra.id, idoso.id), (e) => e.status === 404);
+  assert.equal(familias.buscarIdoso(idoso.id).idade, 82);
+});
+
+test('idoso: so sai do cadastro quem nunca teve plantao', () => {
+  const fam = familias.criar({ responsavel: 'Socorro', email: 'socorro@e.com', telefone: '1',
+    cidade: 'Quixada', bairro: 'Centro' });
+  const semPlantao = familias.adicionarIdoso(fam.id, { nome: 'Maria', idade: 80 });
+  const comPlantao = familias.adicionarIdoso(fam.id, { nome: 'Joao', idade: 85 });
+  const p = plantoes.criar(plantaoBase({ idoso_id: comPlantao.id,
+    data_inicio: '2027-03-01', data_fim: '2027-03-02' }));
+
+  familias.removerIdoso(fam.id, semPlantao.id);
+  assert.equal(familias.listarIdosos(fam.id).length, 1);
+
+  assert.throws(() => familias.removerIdoso(fam.id, comPlantao.id),
+    (e) => e.status === 409 && /plantoes registrados/.test(e.message));
+  plantoes.remover(p.id);
+});
+
+test('plantao: a resposta traz a familia para o lado do cuidador', () => {
+  const p = plantoes.criar(plantaoBase({ data_inicio: '2027-04-01', data_fim: '2027-04-02' }));
+  assert.equal(p.familia.responsavel, 'Marcia');
+  assert.equal(p.familia.id, p.idoso.familia_id);
+  assert.equal(p.familia.email, undefined, 'contato da familia nao vaza no resumo');
+  plantoes.remover(p.id);
+});

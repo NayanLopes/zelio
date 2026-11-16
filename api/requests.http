@@ -104,6 +104,18 @@ Content-Type: application/json
 
 { "nome": "Crianca", "idade": 10 }
 
+### Editar idoso -> 200
+PATCH {{base}}/familias/1/idosos/1
+Content-Type: application/json
+
+{ "idade": 83, "condicao": "Alzheimer inicial, anda com apoio e usa bengala" }
+
+### Remover idoso sem plantao -> 204
+DELETE {{base}}/familias/1/idosos/3
+
+### Remover idoso que ja teve plantao -> 409
+DELETE {{base}}/familias/1/idosos/1
+
 ### ---------- PLANTOES ----------
 
 ### Todos

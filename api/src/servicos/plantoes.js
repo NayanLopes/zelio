@@ -16,9 +16,11 @@ const TRANSICOES = {
 
 function montar(linha) {
   if (!linha) return null;
+  const idoso = repo.idosoResumido(linha.idoso_id);
   return {
     ...linha,
-    idoso: repo.idosoResumido(linha.idoso_id),
+    idoso,
+    familia: repo.familiaResumida(idoso.familia_id),
     cuidador: repo.cuidadorResumido(linha.cuidador_id),
     avaliacoes: avaliacoesRepo.resumoDoPlantao(linha.id),
     avisos: avisosRepo.resumoDoPlantao(linha.id),
