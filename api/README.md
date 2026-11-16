@@ -19,10 +19,11 @@ Para rodar os testes das regras de negócio: `npm test`.
 O banco é um arquivo SQLite (`zelio.db`), criado na primeira execução do `db:reset`.
 Não precisa instalar servidor de banco.
 
-> **Sobre o driver.** O projeto usa `better-sqlite3`. Se a compilação nativa dele
-> falhar na sua máquina, `src/db/driver.js` cai automaticamente no módulo
-> `node:sqlite`, embutido no Node a partir da versão 22.5. A aplicação funciona
-> nos dois casos, e a rota `GET /` informa qual driver está em uso.
+> **Sobre o driver.** O projeto usa `better-sqlite3`, declarado como dependência
+> opcional. Quando não há binário pronto para a versão do Node e a compilação
+> nativa falha, o `npm install` termina mesmo assim e `src/db/driver.js` usa o
+> módulo `node:sqlite`, embutido no Node a partir da versão 22.5. A aplicação
+> funciona nos dois casos, e a rota `GET /` informa qual driver está em uso.
 
 ## Entidades
 
