@@ -3,7 +3,7 @@ const { db, aplicarSchema, arquivo, driver } = require('./index');
 
 aplicarSchema();
 
-const esp = ['Alzheimer', 'Acamado', 'Mobilidade reduzida', 'Pos-cirurgico', 'Diabetes', 'Troca de fraldas'];
+const esp = ['Alzheimer', 'Acamado', 'Mobilidade reduzida', 'Pós-cirúrgico', 'Diabetes', 'Troca de fraldas'];
 const insEsp = db.prepare('INSERT INTO especialidades (nome) VALUES (?)');
 for (const e of esp) insEsp.run(e);
 
@@ -11,14 +11,14 @@ const idDe = {};
 for (const e of db.prepare('SELECT id, nome FROM especialidades').all()) idDe[e.nome] = e.id;
 
 const cuidadores = [
-  ['Rosangela Farias', 'rosangela@exemplo.com', '(88) 99612-1001', 'Quixada', 'Campo Velho', 8, 140, 22,
+  ['Rosangela Farias', 'rosangela@exemplo.com', '(88) 99612-1001', 'Quixadá', 'Campo Velho', 8, 140, 22,
    'aprovado', ['Alzheimer', 'Acamado']],
-  ['Cleide Nascimento', 'cleide@exemplo.com', '(88) 99612-1002', 'Quixada', 'Planalto', 5, 130, 20,
+  ['Cleide Nascimento', 'cleide@exemplo.com', '(88) 99612-1002', 'Quixadá', 'Planalto', 5, 130, 20,
    'aprovado', ['Alzheimer', 'Diabetes']],
-  ['Mairton Alves', 'mairton@exemplo.com', '(88) 99612-1003', 'Quixada', 'Combate', 11, 160, 25,
+  ['Mairton Alves', 'mairton@exemplo.com', '(88) 99612-1003', 'Quixadá', 'Combate', 11, 160, 25,
    'aprovado', ['Alzheimer', 'Mobilidade reduzida']],
-  ['Joana Bezerra', 'joana@exemplo.com', '(88) 99612-1004', 'Quixada', 'Centro', 2, 110, 18,
-   'pendente', ['Pos-cirurgico']],
+  ['Joana Bezerra', 'joana@exemplo.com', '(88) 99612-1004', 'Quixadá', 'Centro', 2, 110, 18,
+   'pendente', ['Pós-cirúrgico']],
 ];
 
 const insCui = db.prepare(`INSERT INTO cuidadores
@@ -36,12 +36,12 @@ for (const c of cuidadores) {
 }
 
 const insFam = db.prepare('INSERT INTO familias (responsavel, email, telefone, cidade, bairro) VALUES (?, ?, ?, ?, ?)');
-const f1 = Number(insFam.run('Marcia Sousa', 'marcia@exemplo.com', '(88) 99612-4408', 'Quixada', 'Centro').lastInsertRowid);
-const f2 = Number(insFam.run('Antonio Ribeiro', 'antonio@exemplo.com', '(88) 99612-7720', 'Quixada', 'Planalto').lastInsertRowid);
+const f1 = Number(insFam.run('Marcia Sousa', 'marcia@exemplo.com', '(88) 99612-4408', 'Quixadá', 'Centro').lastInsertRowid);
+const f2 = Number(insFam.run('Antonio Ribeiro', 'antonio@exemplo.com', '(88) 99612-7720', 'Quixadá', 'Planalto').lastInsertRowid);
 
 const insIdo = db.prepare('INSERT INTO idosos (familia_id, nome, idade, condicao) VALUES (?, ?, ?, ?)');
 const i1 = Number(insIdo.run(f1, 'Antonio Sousa', 82, 'Alzheimer inicial, anda com apoio').lastInsertRowid);
-const i2 = Number(insIdo.run(f2, 'Cicera Ribeiro', 79, 'Mobilidade reduzida apos cirurgia de quadril').lastInsertRowid);
+const i2 = Number(insIdo.run(f2, 'Cicera Ribeiro', 79, 'Mobilidade reduzida após cirurgia de quadril').lastInsertRowid);
 
 const insPl = db.prepare(`INSERT INTO plantoes
   (cuidador_id, idoso_id, modalidade, data_inicio, data_fim, hora_inicio, hora_fim, valor_total, status)
@@ -51,18 +51,21 @@ insPl.run(1, i1, 'diaria', '2026-10-14', '2026-10-18', '07:00', '19:00', 700, 's
 const p3 = Number(insPl.run(2, i2, 'diaria', '2026-11-22', '2026-11-22', '07:00', '19:00', 660, 'aceito').lastInsertRowid);
 
 db.prepare('INSERT INTO avaliacoes (plantao_id, autor, nota, comentario) VALUES (?, ?, ?, ?)')
-  .run(p1, 'familia', 5, 'Muito atencioso com meu pai. Chegou no horario todos os dias.');
+  .run(p1, 'familia', 5, 'Muito atencioso com meu pai. Chegou no horário todos os dias.');
 db.prepare('INSERT INTO avaliacoes (plantao_id, autor, nota, comentario) VALUES (?, ?, ?, ?)')
-  .run(p1, 'cuidador', 5, 'Familia organizada, deixou tudo combinado.');
+  .run(p1, 'cuidador', 5, 'Família organizada, deixou tudo combinado.');
 
 db.prepare('INSERT INTO avisos (plantao_id, tipo, minutos_atraso, mensagem) VALUES (?, ?, ?, ?)')
-  .run(p3, 'atraso', 40, 'Consulta medica da manha atrasou. Chego 40 minutos depois.');
+  .run(p3, 'atraso', 40, 'Consulta médica da manhã atrasou. Chego 40 minutos depois.');
 
 const autenticacao = require('../servicos/autenticacao');
 const SENHA = 'zelio123';
 autenticacao.registrar({ email: 'admin@zelio.app', senha: SENHA, papel: 'admin' });
 autenticacao.registrar({ email: 'marcia@exemplo.com', senha: SENHA, papel: 'familia', familia_id: f1 });
-autenticacao.registrar({ email: 'rosangela@exemplo.com', senha: SENHA, papel: 'cuidador', cuidador_id: 1 });
+autenticacao.registrar({ email: 'antonio@exemplo.com', senha: SENHA, papel: 'familia', familia_id: f2 });
+cuidadores.forEach((c, indice) => {
+  autenticacao.registrar({ email: c[1], senha: SENHA, papel: 'cuidador', cuidador_id: indice + 1 });
+});
 
 const conta = (t) => db.prepare(`SELECT COUNT(*) AS n FROM ${t}`).get().n;
 console.log(`Banco recriado em ${arquivo} (driver: ${driver})`);
@@ -70,4 +73,6 @@ for (const t of ['especialidades', 'cuidadores', 'familias', 'idosos', 'plantoes
   console.log(`  ${t.padEnd(16)} ${conta(t)}`);
 }
 console.log(`\nUsuarios de exemplo, senha ${SENHA}:`);
-console.log('  admin@zelio.app · marcia@exemplo.com · rosangela@exemplo.com');
+console.log('  admin      admin@zelio.app');
+console.log('  familia    marcia@exemplo.com, antonio@exemplo.com');
+console.log(`  cuidador   ${cuidadores.map((c) => c[1]).join(', ')}`);
