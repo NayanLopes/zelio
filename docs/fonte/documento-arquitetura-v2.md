@@ -17,6 +17,7 @@
 | v1 | 27/08/2026 | Primeira versão, derivada do documento de requisitos v1 |
 | v2 | 28/10/2026 | Redução de escopo para marketplace. Saiu o módulo Acompanhamento e tudo que dependia dele: ADR-05, ADR-06, CQ04, CQ05 e os riscos R01 e R02. Entraram o ADR-09, que registra a distância entre a arquitetura alvo e a implementação atual, e o ADR-10, que separa regra de negócio de acesso a dados |
 | v2.2 | 05/11/2026 | Autenticação e autorização implementadas. Entra o ADR-11 |
+| v2.3 | 19/11/2026 | Aplicativo mobile implementado. Entra o ADR-12, sobre o chat por MQTT fora da API |
 
 A v1 descrevia um produto que acompanhava a execução do cuidado. A v2 descreve um
 produto que intermedia a contratação e para por ali. Não é um corte de
@@ -191,9 +192,9 @@ está.
 | Autenticação, sessão e autorização (ADR-11) | Implementada |
 | Separação em três camadas: rotas, serviços e repositórios (ADR-10) | Implementada. Nenhuma linha de SQL fora de `repositorios/` |
 | Módulo Identidade | Implementado. Sessão por token opaco, senha com `scrypt`, autorização por papel e por relação (ADR-11) |
-| Módulo Comunicação (chat, RF05) | Não implementado. Exige recurso de tempo real |
+| Módulo Comunicação (chat, RF05) | Implementado no aplicativo, sobre MQTT, sem passar pela API (ADR-12). Falta verificar entre dois aparelhos |
 | Documentos em bucket privado (ADR-04) | Não implementado. Hoje existe apenas o registro do documento, sem o binário |
-| Aplicativo mobile | Não implementado. Existe protótipo navegável de oito telas |
+| Aplicativo mobile | Implementado. React Native com Expo, 16 telas, navegação montada conforme o papel que a API devolve no login |
 
 O ADR-09 registra a distância entre a tecnologia alvo e a usada na implementação
 atual.
@@ -571,6 +572,8 @@ dali. É o que permite à interface não duplicar a regra.
 > banco. O ADR-10 fechou essa distância. Fica registrado porque um documento de
 > arquitetura que descreve o sistema que se gostaria de ter, e não o que existe,
 > perde a função.
+**Atualização de 19/11.** O `better-sqlite3` passou a ser dependência opcional. Ele compila binário nativo por sistema operacional, e isso quebrava quem clonasse o repositório em outro sistema. Com a mudança, o adaptador cai no `node:sqlite` embutido quando o nativo não está presente, e a suíte passa com os dois.
+
 **Consequências.** SQLite não suporta escrita concorrente de verdade, o que é irrelevante no volume atual e inaceitável em produção. A migração é dívida técnica assumida e está no risco R08. Em compensação, a API sobe com `npm install && npm start`, sem nenhuma dependência externa — o que também a torna demonstrável em sala, sem depender da rede.
 
 ### ADR-10: Camada de repositórios separando regra de negócio e SQL
@@ -598,6 +601,18 @@ A fronteira tem uma regra que vale a pena explicitar: **o repositório não lan�
 A guarda mais interessante é a da mudança de estado. Mover para `aceito` ou `recusado` é privativo do cuidador daquele plantão, porque é nisso que a RN02 consiste; mover para `concluido` ou `cancelado` qualquer uma das duas partes pode. Antes disso, a RN02 existia só como tabela de transições: qualquer pessoa com o identificador do plantão podia aceitar em nome do cuidador.
 
 **Consequências.** Toda requisição autenticada custa uma consulta à tabela de sessões, o que é irrelevante neste volume e é o preço da revogação. Sessões expiradas são varridas a cada login. Falta ligar o cadastro de documento (ADR-04) ao usuário dono, e falta recuperação de senha, que não existe neste MVP.
+
+### ADR-12: Chat por MQTT entre os aparelhos, fora da API
+
+**Contexto.** O RF05 pede conversa entre família e cuidador antes da contratação. A arquitetura previa isso no módulo Comunicação, com WebSocket na própria API, e era o requisito que vinha sendo adiado desde a v1 por exigir recurso de tempo real.
+
+**Decisão.** Decidi resolver o tempo real por um broker MQTT externo, sobre WebSocket, com os aparelhos publicando e assinando diretamente. A API não participa da conversa e não guarda mensagem. O tópico identifica o par: `ufc-quixada/zelio/conversas/cuidador-<id>/familia-<id>`. Cada lado assina com curinga o que lhe diz respeito, a família `conversas/+/familia-<id>` e o cuidador `conversas/cuidador-<id>/+`. O histórico fica no próprio aparelho, limitado às últimas mensagens.
+
+**Alternativas.** *WebSocket na API*: mantém tudo sob um teto e permite histórico no servidor, mas obriga a API a ter processo com estado e conexão persistente, o que o plano de hospedagem gratuito previsto na seção 10 não sustenta bem. *Polling sobre REST*: simples, porém gasta bateria e rede para um recurso que fica ocioso a maior parte do tempo. *Serviço gerenciado de mensagens*: resolveria, mas acrescenta conta, custo e dependência de terceiro no caminho crítico.
+
+**Consequências.** O servidor não vê as mensagens, o que é bom para privacidade e ruim para moderação: uma denúncia de assédio no chat não tem como ser apurada, e isso conversa diretamente com o risco R10. O histórico vive no aparelho, então trocar de celular perde a conversa. A entrega depende de um broker que o projeto não controla. O RF05 fica, por enquanto, o único requisito sem teste automatizado, porque testá-lo exige dois clientes conectados à rede.
+
+**Pendência.** A troca ponta a ponta ainda não foi verificada entre dois aparelhos. Enquanto isso não acontecer, o requisito consta como implementado e não comprovado.
 
 ---
 
@@ -648,7 +663,7 @@ negócio e a verificação de fronteiras do R03 a cada push.
 | RF01, RF03 | Identidade | API + banco | Cadastro sim; autenticação não |
 | RF02, RF11 | Verificação | API + Object Storage + Painel Admin | Registro e aprovação sim; binário não |
 | RF04 | Catálogo | API + banco | Sim |
-| RF05 | Comunicação | API (WebSocket) | Não |
+| RF05 | Comunicação | Aplicativo, por MQTT (ADR-12) | Sim, sem verificação entre aparelhos |
 | RF06, RF10 | Contratação | API + banco | Sim |
 | RF07 | Reputação | API + banco | Sim |
 | RF13 | Verificação | API + Object Storage + Painel Admin | Não |
