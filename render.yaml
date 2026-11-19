@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: zelio-api
+    runtime: node
+    plan: free
+    rootDir: api
+    buildCommand: npm install
+    startCommand: npm run db:reset && npm start
+    healthCheckPath: /cuidadores
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
