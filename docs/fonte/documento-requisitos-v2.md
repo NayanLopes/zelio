@@ -109,7 +109,7 @@ de renda. Busca um jeito de ser encontrado sem depender de quem se lembra dele.
 | RF02 | Envio de documentos comprobatórios (antecedentes criminais, certificados) para verificação | Alta | Implementado na API |
 | RF03 | Cadastro de famílias com dados do idoso e tipo de cuidado necessário | Alta | Implementado na API, com autenticação |
 | RF04 | Busca e filtro de cuidadores por especialidade, localização e avaliação | Alta | Implementado na API |
-| RF05 | Chat entre família e cuidador antes da contratação | Alta | Previsto — exige recurso de tempo real |
+| RF05 | Chat entre família e cuidador antes da contratação | Alta | Implementado no aplicativo, sobre MQTT |
 | RF06 | Agendamento de plantões nas modalidades horista, diária e mensal | Alta | Implementado na API |
 | RF07 | Avaliação e comentário mútuo após a conclusão do plantão | Média | Implementado na API |
 | RF10 | Aviso à família em caso de cancelamento ou atraso do cuidador | Média | Implementado na API |
@@ -118,8 +118,14 @@ de renda. Busca um jeito de ser encontrado sem depender de quem se lembra dele.
 | RF14 | O cuidador vê, antes de aceitar, quem é a família, o endereço aproximado, quem mais mora na casa e a reputação dela na plataforma | Alta | Previsto |
 | RF15 | Registro de início e fim do plantão pelas duas partes, formando comprovante de que o serviço ocorreu | Média | Previsto |
 
-A coluna de situação se refere à API REST em `api/`. "Implementado" significa que
-existe endpoint, validação e teste automático cobrindo o requisito.
+A coluna de situação cobre as duas partes do sistema: a API REST em `api/` e o
+aplicativo em `mobile/`. "Implementado na API" significa que existe endpoint,
+validação e teste automático cobrindo o requisito. O RF05 é o único que não passa
+pela API: o chat acontece entre os aparelhos, por MQTT, sem guardar mensagem no
+servidor (ADR-12).
+
+A troca de mensagens do RF05 ainda não foi verificada entre dois aparelhos reais.
+Até que isso aconteça, o requisito está implementado mas não comprovado.
 
 ---
 

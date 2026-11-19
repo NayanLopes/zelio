@@ -14,7 +14,7 @@ GET {{base}}/especialidades
 GET {{base}}/cuidadores
 
 ### Busca com filtros
-GET {{base}}/cuidadores?especialidade=Alzheimer&cidade=Quixada&nota_minima=4
+GET {{base}}/cuidadores?especialidade=Alzheimer&cidade=Quixad%C3%A1&nota_minima=4
 
 ### Visao administrativa, incluindo quem ainda nao foi aprovado
 GET {{base}}/cuidadores?incluir_nao_aprovados=true
@@ -30,7 +30,7 @@ Content-Type: application/json
   "nome": "Teste da Silva",
   "email": "teste@exemplo.com",
   "telefone": "(88) 99000-0000",
-  "cidade": "Quixada",
+  "cidade": "Quixadá",
   "bairro": "Centro",
   "anos_experiencia": 3,
   "valor_diaria": 120,
@@ -90,7 +90,7 @@ POST {{base}}/familias
 Content-Type: application/json
 
 { "responsavel": "Teste Responsavel", "email": "resp@exemplo.com",
-  "telefone": "(88) 99000-1111", "cidade": "Quixada", "bairro": "Centro" }
+  "telefone": "(88) 99000-1111", "cidade": "Quixadá", "bairro": "Centro" }
 
 ### Cadastrar idoso da familia -> 201
 POST {{base}}/familias/1/idosos
@@ -103,6 +103,18 @@ POST {{base}}/familias/1/idosos
 Content-Type: application/json
 
 { "nome": "Crianca", "idade": 10 }
+
+### Editar idoso -> 200
+PATCH {{base}}/familias/1/idosos/1
+Content-Type: application/json
+
+{ "idade": 83, "condicao": "Alzheimer inicial, anda com apoio e usa bengala" }
+
+### Remover idoso sem plantao -> 204
+DELETE {{base}}/familias/1/idosos/3
+
+### Remover idoso que ja teve plantao -> 409
+DELETE {{base}}/familias/1/idosos/1
 
 ### ---------- PLANTOES ----------
 

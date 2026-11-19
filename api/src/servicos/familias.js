@@ -52,5 +52,30 @@ function buscarIdoso(idosoId) {
   return i;
 }
 
+function idosoDaFamilia(familiaId, idosoId) {
+  buscarPorId(familiaId);
+  const i = repo.buscarIdoso(idosoId);
+  if (!i || i.familia_id !== familiaId) throw AppError.naoEncontrado('Idoso');
+  return i;
+}
+
+const IDOSO_ATUALIZAVEIS = ['nome', 'idade', 'condicao'];
+
+function atualizarIdoso(familiaId, idosoId, dados) {
+  idosoDaFamilia(familiaId, idosoId);
+  const campos = IDOSO_ATUALIZAVEIS.filter((c) => dados[c] !== undefined);
+  if (campos.length === 0) throw AppError.invalido('Nenhum campo atualizavel foi enviado');
+  repo.atualizarIdoso(idosoId, campos, campos.map((c) => dados[c]));
+  return repo.buscarIdoso(idosoId);
+}
+
+function removerIdoso(familiaId, idosoId) {
+  idosoDaFamilia(familiaId, idosoId);
+  if (repo.contarPlantoesDoIdoso(idosoId) > 0) {
+    throw AppError.conflito('Nao e possivel remover um idoso que ja tem plantoes registrados');
+  }
+  repo.removerIdoso(idosoId);
+}
+
 module.exports = { listar, buscarPorId, criar, atualizar, remover,
-                   listarIdosos, adicionarIdoso, buscarIdoso };
+                   listarIdosos, adicionarIdoso, buscarIdoso, atualizarIdoso, removerIdoso };

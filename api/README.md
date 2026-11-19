@@ -19,10 +19,11 @@ Para rodar os testes das regras de negócio: `npm test`.
 O banco é um arquivo SQLite (`zelio.db`), criado na primeira execução do `db:reset`.
 Não precisa instalar servidor de banco.
 
-> **Sobre o driver.** O projeto usa `better-sqlite3`. Se a compilação nativa dele
-> falhar na sua máquina, `src/db/driver.js` cai automaticamente no módulo
-> `node:sqlite`, embutido no Node a partir da versão 22.5. A aplicação funciona
-> nos dois casos, e a rota `GET /` informa qual driver está em uso.
+> **Sobre o driver.** O projeto usa `better-sqlite3`, declarado como dependência
+> opcional. Quando não há binário pronto para a versão do Node e a compilação
+> nativa falha, o `npm install` termina mesmo assim e `src/db/driver.js` usa o
+> módulo `node:sqlite`, embutido no Node a partir da versão 22.5. A aplicação
+> funciona nos dois casos, e a rota `GET /` informa qual driver está em uso.
 
 ## Entidades
 
@@ -66,6 +67,8 @@ que a rota aceita:
 | Avisar atraso ou cancelamento | só o cuidador daquele plantão (RF10) |
 | Criar plantão | `familia` |
 | Ler ou avaliar um plantão | só quem é parte dele |
+| Listar plantões | cada lado vê os seus; `admin` vê todos |
+| Editar ou remover idoso | a família responsável, ou `admin` |
 | Alterar um cadastro | o dono dele, ou `admin` |
 
 A senha é guardada com `scrypt` e sal sorteado por usuário, usando o módulo
@@ -99,10 +102,12 @@ lista de bloqueio à parte.
 | DELETE | `/familias/:id` | Remove |
 | GET | `/familias/:id/idosos` | Idosos da família |
 | POST | `/familias/:id/idosos` | Cadastra idoso |
+| PATCH | `/familias/:id/idosos/:idosoId` | Atualiza nome, idade ou condição |
+| DELETE | `/familias/:id/idosos/:idosoId` | Remove. 409 se o idoso já teve plantão |
 | POST | `/sessoes` | Entra e devolve o token |
 | DELETE | `/sessoes` | Sai e revoga o token |
 | GET | `/eu` | Quem é o dono do token |
-| GET | `/plantoes` | Filtros: `status`, `cuidador_id`, `idoso_id`, `familia_id` |
+| GET | `/plantoes` | Filtros: `status`, `cuidador_id`, `idoso_id`, `familia_id`. Família e cuidador recebem só os próprios |
 | GET | `/plantoes/:id` | Um plantão, com as transições possíveis |
 | POST | `/plantoes` | Família solicita. Nasce `solicitado` |
 | PATCH | `/plantoes/:id/status` | Muda o estado, respeitando as transições |
@@ -193,7 +198,7 @@ src/
     driver.js            adaptador entre better-sqlite3 e node:sqlite
     schema.sql           tabelas, chaves estrangeiras e CHECKs
     seed.js              recria o banco com dados de exemplo
-testes/regras.test.js    21 testes das regras de negócio
+testes/regras.test.js    25 testes das regras de negócio
 requests.http            exemplos de requisição
 ```
 
