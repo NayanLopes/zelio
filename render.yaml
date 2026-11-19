@@ -6,7 +6,7 @@ services:
     rootDir: api
     buildCommand: npm install
     startCommand: npm run db:reset && npm start
-    healthCheckPath: /cuidadores
+    healthCheckPath: /
     envVars:
       - key: NODE_VERSION
         value: "24"
