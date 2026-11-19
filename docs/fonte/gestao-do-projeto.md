@@ -4,7 +4,7 @@
 **Disciplina:** Projeto Integrado em Engenharia de Software III
 **Professora:** Leonara Braz (2026.2, UFC Campus Quixadá)
 **Aluno:** Vitor Nayan
-**Data:** 28/10/2026 — Review Sprint 3
+**Data:** 19/11/2026, Review Sprint 4
 
 ---
 
@@ -47,7 +47,18 @@ A consequência arquitetural foi grande: saiu um módulo inteiro, duas decisões
 de arquitetura, dois cenários de qualidade e dois riscos. O registro está na
 seção 15 do documento de arquitetura v2.
 
-### 2.3 Entrada de escopo: segurança do cuidador
+### 2.3 Antecipação de escopo na sprint 4
+
+O aplicativo mobile estava planejado para a sprint 5 e foi entregue na 4. Isso não
+foi ganho de produtividade: foi troca. As duas entrevistas de validação, que eram
+o outro item da sprint 4, não aconteceram, e o esforço foi todo para o código.
+
+A troca tem um efeito que vale dizer em voz alta. O aplicativo foi construído
+sobre requisitos que continuam sem validação de campo. Se a H8 cair, parte dessas
+16 telas foi escrita para um produto que não se sustenta. Antecipar código não
+reduz esse risco, aumenta o que se perde caso ele se concretize.
+
+### 2.4 Entrada de escopo: segurança do cuidador
 
 Nem toda mudança de escopo é corte. Na sprint 3 entraram três requisitos novos,
 RF13, RF14 e RF15, depois de uma observação do professor da disciplina de
@@ -65,7 +76,7 @@ motivo específico: uma plataforma que verifica um lado só empresta credibilida
 ao lado não verificado. Isso é o risco R10 da arquitetura, e não é um risco que
 se possa deixar para depois sem mudar o que a interface promete enquanto isso.
 
-### 2.4 Efeito da redução sobre o prazo
+### 2.5 Efeito da redução sobre o prazo
 
 A redução diminuiu o trabalho de implementação e aumentou, no curto prazo, o
 trabalho de documentação: todo documento escrito sob o escopo antigo precisou
@@ -117,8 +128,7 @@ A Sprint Review 2 valia 10% da AV2 e não foi apresentada. Isso não é
 recuperável e está registrado aqui porque gestão de cronograma que omite a
 própria falha não é gestão.
 
-O que resta da AV2 — sprints 3, 4, 5 e 6 — soma 75%, e as duas últimas
-concentram 45%. O plano da seção 4 foi montado para que o esforço cresça em
+O que resta da AV2, sprints 4, 5 e 6, soma 60%, e as duas últimas concentram 45%. O plano da seção 4 foi montado para que o esforço cresça em
 direção a elas, e não o contrário.
 
 ---
@@ -130,8 +140,8 @@ direção a elas, e não o contrário.
 | Sprint | Review | Peso | Incremento planejado |
 |---|---|---|---|
 | 3 | 29/10 | 15% | V2 de requisitos, arquitetura e roteiro; RF10 implementado na API com a regra RN05; separação em três camadas (ADR-10); segurança do cuidador incorporada ao escopo (RF13-RF15) |
-| 4 | 12/11 | 15% | Autenticação e sessão na API; duas entrevistas de validação realizadas e registradas, com H10 na pauta |
-| 5 | 26/11 | 20% | Verificação do lado da família (RF13) e o que o cuidador vê antes de aceitar (RF14); aplicativo em React Native consumindo a API: busca, perfil e solicitação de plantão |
+| 4 | 19/11 | 15% | **Entregue:** autenticação, sessão e autorização por papel (ADR-11); aplicativo em React Native com 16 telas consumindo a API; chat por MQTT (ADR-12); `better-sqlite3` como dependência opcional. **Não entregue:** as entrevistas de validação |
+| 5 | 26/11 | 20% | Verificação do lado da família (RF13) e o que o cuidador vê antes de aceitar (RF14); verificação do chat entre dois aparelhos; registro de início e fim do plantão (RF15) |
 | 6 | 03/12 | 25% | Fluxo completo até a avaliação; consolidação das entrevistas; ajuste dos requisitos conforme a evidência coletada |
 
 ### 4.2 Regra de ritmo adotada
