@@ -24,6 +24,12 @@
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "59b64c59-10fc-4657-891a-786110e84998"
+      }
+    },
+    "owner": "cocagelolimao"
   }
 }

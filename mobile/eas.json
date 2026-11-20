@@ -10,7 +10,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "COLE_AQUI_A_URL_DO_RENDER"
+        "EXPO_PUBLIC_API_URL": "https://zelio-api.onrender.com"
       }
     },
     "production": {

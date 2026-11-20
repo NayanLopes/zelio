@@ -110,7 +110,7 @@ Um produto real moveria a conversa para a API, com autenticação e armazenament
 
 | Tipo | Situação | O que a interface mostra |
 |---|---|---|
-| `conexao` | Sem rede, servidor fora do ar ou 10 segundos sem resposta | Aviso de conexão, com botão para tentar de novo |
+| `conexao` | Sem rede, servidor fora do ar ou 60 segundos sem resposta | Aviso de conexão, com botão para tentar de novo |
 | `resposta_invalida` | Corpo que não é JSON ou sem os campos esperados | Aviso de resposta inesperada |
 | `sessao` | `401` em chamada com token | Volta para a tela de entrada |
 | `credenciais` | `401` no login | "E-mail ou senha incorretos." |
