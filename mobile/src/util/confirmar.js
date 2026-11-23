@@ -1,6 +1,9 @@
-import { Alert } from 'react-native';
+import { Alert, Platform } from 'react-native';
 
 export function confirmar({ titulo, texto, acao, destrutiva = false }) {
+  if (Platform.OS === 'web') {
+    return Promise.resolve(window.confirm(`${titulo}\n\n${texto}`));
+  }
   return new Promise((resolver) => {
     Alert.alert(
       titulo,
